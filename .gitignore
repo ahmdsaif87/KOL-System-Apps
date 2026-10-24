@@ -1,0 +1,53 @@
+# =========================================================
+# Monorepo KOL-System-Apps
+#   landing/   → kolab.id        (CI3, SSR dari Campaign API)
+#   campaign/  → app.kolab.id    (CI3 enterprise — Campaign API)
+#   datahub/   → datahub.kolab.id(CI3 card generator)
+#   shared/uploads → aset upload semua app (runtime, tidak di-commit)
+# =========================================================
+
+# --- Build & deps dev ---------------------------------------------------
+node_modules/
+package-lock.json.bak
+
+# --- Runtime CI3: cache & log (jaring pengaman; detail ada di .gitignore per app) ---
+**/application/cache/*
+!**/application/cache/index.html
+!**/application/cache/.htaccess
+**/application/logs/*
+!**/application/logs/index.html
+!**/application/logs/.htaccess
+
+# --- Uploads ------------------------------------------------------------
+# Path uploads di campaign/datahub adalah SYMLINK ke ../shared/uploads/*.
+# Symlink dibuat oleh setup-server.sh (server) atau manual (lokal) — tidak di-commit.
+campaign/uploads
+datahub/uploads
+shared/uploads/*
+!shared/uploads/.gitkeep
+
+# --- Out-of-scope repo ini (dikelola terpisah, tetap ada di disk) ------------
+whatsapp-service/
+kol-sentiment-analysis/
+
+# --- Secret & dump database: JANGAN PERNAH di-commit -----------------------
+.env
+.env.*
+*.env
+kol.sql
+*.sql.gz
+*.pem
+
+# --- File lokal saja -------------------------------------------------------
+landing-review/
+/artikel-hook-konten-kol.md
+/artikel-usage-rights-whitelisting-kol.md
+/SECRET_SCAN_REPORT.md
+
+# Diabaikan dari repo (kunci/konfigurasi produksi)
+config-private/
+
+# --- OS / IDE ---------------------------------------------------------------
+.DS_Store
+.idea/
+.vscode/

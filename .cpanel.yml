@@ -1,0 +1,28 @@
+---
+# =====================================================================
+# cPanel Git Version Control — deploy monorepo KOL-System-Apps
+# =====================================================================
+# PENTING (sekali saja sebelum deploy pertama):
+#   1. Jalankan setup-server.sh via cPanel Terminal untuk membuat folder
+#      shared/uploads + symlink uploads + permission 775.
+#   2. Pastikan subdomain docroot mengarah ke:
+#        kolab.id        → ~/KOL-System-Apps/landing
+#        app.kolab.id    → ~/KOL-System-Apps/campaign
+#        datahub.kolab.id→ ~/KOL-System-Apps/datahub
+#   3. Karena SATU repo = SATU kali deploy, maka tiap "Update from Remote
+#      → Deploy HEAD Commit" menjalankan rsync untuk SEMUA app.
+#
+# rsync -a mempertahankan symlink; target yang dikecualikan (uploads/,
+# shared/) aman dari --delete.
+# =====================================================================
+deployment:
+  tasks:
+    - export CT_ROOT=$HOME/KOL-System-Apps && mkdir -p $CT_ROOT/landing/application/cache $CT_ROOT/landing/application/logs $CT_ROOT/campaign/application/cache $CT_ROOT/campaign/application/logs $CT_ROOT/datahub/application/cache $CT_ROOT/datahub/application/logs $CT_ROOT/shared/uploads
+    - test -e $CT_ROOT/campaign/uploads || ln -s ../shared/uploads/campaign $CT_ROOT/campaign/uploads
+    - test -e $CT_ROOT/datahub/uploads || ln -s ../shared/uploads/datahub $CT_ROOT/datahub/uploads
+    - /usr/bin/rsync -a --delete --exclude='.git' --exclude='.gitignore' --exclude='.env*' --exclude='application/cache' --exclude='application/logs' --exclude='node_modules' landing/ $CT_ROOT/landing/
+    - /usr/bin/rsync -a --delete --exclude='.git' --exclude='.gitignore' --exclude='.env*' --exclude='application/cache' --exclude='application/logs' --exclude='whatsapp-service' --exclude='uploads' campaign/ $CT_ROOT/campaign/
+    - /usr/bin/rsync -a --delete --exclude='.git' --exclude='.gitignore' --exclude='.env*' --exclude='application/cache' --exclude='application/logs' --exclude='uploads' datahub/ $CT_ROOT/datahub/
+    - /bin/chmod -R g+w $CT_ROOT/landing/application/cache $CT_ROOT/landing/application/logs 2>/dev/null || true
+    - /bin/chmod -R g+w $CT_ROOT/campaign/application/cache $CT_ROOT/campaign/application/logs 2>/dev/null || true
+    - /bin/chmod -R g+w $CT_ROOT/datahub/application/cache $CT_ROOT/datahub/application/logs 2>/dev/null || true

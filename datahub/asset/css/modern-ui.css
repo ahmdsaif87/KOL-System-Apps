@@ -1,0 +1,338 @@
+/* ==========================================================================
+   MODERN UI OVERRIDE UNTUK ADMINLTE 2
+   ========================================================================== */
+
+/* 1. TYPOGRAPHY & GLOBAL */
+body, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'Inter', 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+}
+
+body {
+    background-color: #f4f6f9 !important; /* Soft grey background */
+    color: #374151 !important; /* Tailwind gray-700 */
+}
+
+/* 2. BOXES & CARDS */
+.box {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    border: none !important;
+    margin-bottom: 24px !important;
+    background-color: #ffffff !important;
+}
+
+/* Hilangkan garis tebal di atas box (misal box-primary, box-warning) kecuali dipertahankan sedikit membulat */
+.box.box-primary, .box.box-info, .box.box-danger, .box.box-warning, .box.box-success, .box.box-default {
+    border-top: 3px solid transparent !important; /* Hilangkan garis warna tajam atas */
+}
+/* Opsional: Kembalikan garis dengan bentuk membulat jika suka garis atas */
+/* .box.box-primary { border-top: 4px solid #3c8dbc !important; border-top-left-radius: 12px; border-top-right-radius: 12px; } */
+
+.box-header {
+    border-bottom: 1px solid #f3f4f6 !important;
+    padding: 16px 20px !important;
+}
+
+.box-body {
+    padding: 20px !important;
+}
+
+.box-footer {
+    border-top: 1px solid #f3f4f6 !important;
+    border-bottom-left-radius: 12px !important;
+    border-bottom-right-radius: 12px !important;
+    padding: 16px 20px !important;
+    background-color: #f9fafb !important;
+}
+
+/* 3. BUTTONS */
+.btn {
+    border-radius: 8px !important;
+    padding: 8px 16px !important;
+    font-weight: 500 !important;
+    border: none !important;
+    transition: all 0.2s ease-in-out !important;
+}
+.btn-sm, .btn-group-sm > .btn {
+    padding: 5px 10px !important;
+    border-radius: 6px !important;
+}
+.btn-xs {
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+}
+
+/* Button Hover Effects */
+.btn:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    transform: translateY(-1px);
+}
+.btn:active {
+    transform: translateY(0);
+}
+
+/* 4. FORM INPUTS */
+.form-control {
+    border-radius: 8px !important;
+    border: 1px solid #d1d5db !important;
+    padding: 10px 14px !important;
+    height: auto !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease-in-out !important;
+    color: #111827 !important;
+}
+
+.form-control:focus {
+    border-color: #3b82f6 !important; /* Tailwind blue-500 */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important; /* Soft focus ring */
+}
+
+/* Select2 Customization */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    border-radius: 8px !important;
+    border: 1px solid #d1d5db !important;
+    padding: 4px 8px !important;
+    min-height: 42px !important;
+}
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* 5. TABLES & RESPONSIVE CONTAINERS */
+.table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border: 1px solid #edf2f7 !important;
+    border-radius: 10px !important;
+    background-color: #ffffff !important;
+    margin-bottom: 20px !important;
+}
+
+/* Custom sleek scrollbar for horizontal scroll */
+.table-responsive::-webkit-scrollbar {
+    height: 8px !important;
+}
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f5f9 !important;
+    border-radius: 4px !important;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 4px !important;
+}
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8 !important;
+}
+
+.table, 
+table.dataTable {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    border: none !important;
+    margin-bottom: 0 !important;
+}
+
+.table > thead > tr > th,
+table.dataTable thead > tr > th {
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 13px !important;
+    letter-spacing: 0.04em !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    border-top: none !important;
+    padding: 14px 20px !important;
+    white-space: nowrap !important;
+}
+
+.table > tbody > tr > td,
+table.dataTable tbody > tr > td {
+    padding: 14px 20px !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    border-top: none !important;
+    color: #1e293b !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    white-space: nowrap !important;
+}
+
+/* Hilangkan garis vertical (border table kotak-kotak) */
+.table-bordered, 
+.table-bordered > thead > tr > th, 
+.table-bordered > tbody > tr > th, 
+.table-bordered > tfoot > tr > th, 
+.table-bordered > thead > tr > td, 
+.table-bordered > tbody > tr > td, 
+.table-bordered > tfoot > tr > td {
+    border-right: none !important;
+    border-left: none !important;
+    border-top: none !important;
+}
+
+/* Row Hover */
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #ffffff !important;
+}
+.table > tbody > tr:hover,
+table.dataTable tbody > tr:hover {
+    background-color: #f1f5f9 !important;
+}
+
+/* Actions Column Specific Spacing */
+.table td:last-child,
+.table th:last-child {
+    min-width: 180px !important;
+    white-space: nowrap !important;
+}
+
+.table td a.label-default {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 6px !important;
+    background: #f1f5f9 !important;
+    color: #334155 !important;
+    font-size: 14px !important;
+    margin: 0 2px !important;
+    text-decoration: none !important;
+    transition: all 0.15s ease !important;
+    vertical-align: middle !important;
+}
+
+.table td a.label-default:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+.table td a.btn.btn-xs,
+.table td button.btn.btn-xs {
+    margin: 2px 3px !important;
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+}
+
+/* 6. LABEL / BADGE */
+.label {
+    border-radius: 6px !important;
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+    letter-spacing: 0.02em !important;
+}
+
+/* 7. OTHER REFINEMENTS */
+.content-header > h1 {
+    font-weight: 700 !important;
+    color: #111827 !important;
+}
+.content-header > .breadcrumb {
+    background: transparent !important;
+}
+
+/* Tweak sidebar */
+.main-sidebar {
+    box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+}
+
+/* 8. GLOBAL SCROLL FIX FOR ADMINLTE FIXED LAYOUT */
+html, body {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;
+}
+
+body.fixed,
+body.fixed .wrapper {
+    overflow-y: visible !important;
+    height: auto !important;
+    min-height: 100% !important;
+}
+
+.content-wrapper {
+    height: auto !important;
+    min-height: 100% !important;
+}
+
+/* 9. SOURCING MODEL PILLS (OPTION 2: UNIFIED COMPACT) */
+.sourcing-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    border-radius: 9999px !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+    overflow: hidden !important;
+    border: 1px solid transparent !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    vertical-align: middle !important;
+}
+
+.sourcing-pill-open {
+    background-color: #ecfdf5 !important;
+    border-color: #a7f3d0 !important;
+}
+
+.sourcing-pill-open .pill-label {
+    padding: 3px 8px !important;
+    color: #065f46 !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.sourcing-pill-open .pill-counter-pending {
+    padding: 3px 7px !important;
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 10px !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    border-left: 1px solid #d97706 !important;
+    transition: background-color 0.15s ease !important;
+}
+
+.sourcing-pill-open .pill-counter-pending:hover {
+    background-color: #d97706 !important;
+    color: #ffffff !important;
+}
+
+.sourcing-pill-open .pill-counter-total {
+    padding: 3px 6px !important;
+    background-color: #e2e8f0 !important;
+    color: #475569 !important;
+    font-weight: 600 !important;
+    font-size: 10px !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    border-left: 1px solid #cbd5e1 !important;
+}
+
+.sourcing-pill-appointed {
+    background-color: #eff6ff !important;
+    border-color: #bfdbfe !important;
+    padding: 3px 9px !important;
+    color: #1d4ed8 !important;
+    font-weight: 600 !important;
+    gap: 4px !important;
+}
+
+
