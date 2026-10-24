@@ -26,6 +26,18 @@ chmod -R 775 "$ROOT/shared/uploads" 2>/dev/null || true
 [ -e "$ROOT/campaign/uploads" ] || ln -s ../shared/uploads/campaign "$ROOT/campaign/uploads"
 [ -e "$ROOT/datahub/uploads" ]  || ln -s ../shared/uploads/datahub  "$ROOT/datahub/uploads"
 
+# database.php produksi: dipertahankan antar-deploy (di-exclude .cpanel.yml).
+# Sebelum deploy pertama, pastikan ada template salinannya (credential diisi
+# manual via File Manager: nama DB cPanel-prefixed, user, password).
+CLONE="${1:-$HOME/repositories/KOL-System-Apps}"
+for APP in campaign datahub; do
+    [ -f "$ROOT/$APP/application/config/database.php" ] && continue
+    if [ -f "$CLONE/$APP/application/config/database.php" ]; then
+        cp "$CLONE/$APP/application/config/database.php" "$ROOT/$APP/application/config/database.php"
+        echo "catatan: $APP/application/config/database.php ditaruh kosong-credential — isi di server"
+    fi
+done
+
 echo "Selesai. Verifikasi:"
 ls -l "$ROOT/campaign/uploads" "$ROOT/datahub/uploads"
 echo ""

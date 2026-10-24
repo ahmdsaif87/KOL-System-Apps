@@ -66,18 +66,39 @@ SetEnv LANDING_API_BASE https://app.kolab.id   # sesuai hasil konfirmasi IT
 Landing default bila `LANDING_API_BASE` kosong: `http://localhost:8000`
 (API Campaign di-host sama → tetap bekerja, hanya lebih jauh dari HTTP-rewrite).
 
-Campaign/datahub: kredensial DB di konfigurasikan pada `application/database.php`
-di folder LIVE (tidak berada di clone-deploy yang di-rsync jika ditandai
-?.env; jaga tetap out-of-repo). LANDING read-only, tidak punya DB.
+## Database — SATU DB dipakai campaign + datahub
+
+Kedua app CI3 menunjuk DB yang sama (`'database' => 'KOL'`): menu, user,
+`cc_options`, dan semua opsi runtime dibagi bersama. Data artikel lives in
+table `articles` (dibaca API `/articles/feed` oleh landing).
+
+Aturan produksi:
+
+1. **Import sekali**: dump terbaru `campaign/kol.sql` (90 tabel, superset)
+   → via phpMyAdmin ke DB `cpanelfolder_KOL` (nama DB di cPanel selalu
+   di-prefixed username akun).
+2. **Kredensial DB**: isi di `application/database.php` masing-masing app
+   di folder LIVE — nama DB/user/password cPanel. File ini di-EXCLUDE oleh
+   `.cpanel.yml` (tidak ikut rsync --delete), jadi cukup diset SEKALI; deploy
+   berikutnya tidak menimpanya. `setup-server.sh` otomatis menaruh salinan
+   template bila belum ada.
+3. **Seed API keys (sekali)**: jalankan `config-private/
+   cc_options-seeds-KOL.sql` di phpMyAdmin (insert-if-missing /
+   update-if-empty; tidak menimpa nilai yang sudah terisi).
+4. Kemudian edit key lewat menu admin (Keyapi Config/Options) — langsung
+   berlaku ke campaign & datahub, cukup sekali.
 
 ## Keamanan repo
 
 - `campaign/whatsapp-service/` di-exclude (tidak masuk repo/deploy),
   termasuk `session_auth/` berisi kredensial WA.
-- `kol.sql` (dump DB asli) di-exclude; `ci3.sql` (template schema) ikut repo.
+- `kol.sql` (dump DB asli) di-exclude; `ci3.sql` (template schema, sudah
+  dibersihkan) ikut repo.
 - `vendor/` COMMITTED (composer_autoload aktif; cPanel tidak punya composer).
 - `shared/uploads` tidak di-commit kecuali `.gitkeep`; file runtime tetap aman
   di server karena rsync excludes.
+- Semua runtime API keys dibaca dari DB (`cc_options`) — repo menyimpan
+  fallback `''` saja. Seed SQL-nya tinggal di `config-private/` (lokalis).
 
 ## Development lokal
 
