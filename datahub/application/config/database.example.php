@@ -2,6 +2,13 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /*
+| ------------------------------------------------------------------------
+| TEMPLATE — SALIN menjadi `database.php` lalu isi kredensial
+| (lokal Anda / live server cPanel; config yang asli tidak pernah ke-push git)
+| ------------------------------------------------------------------------
+*/
+
+/*
 | -------------------------------------------------------------------
 | DATABASE CONNECTIVITY SETTINGS
 | -------------------------------------------------------------------
@@ -94,3 +101,4 @@ $db['default'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+

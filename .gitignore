@@ -38,6 +38,11 @@ kol.sql
 *.sql.gz
 *.pem
 
+# Konfigurasi DB per app: hanya template (database.example.php) yang di-commit.
+# database.php asli tinggal di disk (lokal & di server live).
+**/application/config/database.php
+!**/application/config/database.example.php
+
 # --- File lokal saja -------------------------------------------------------
 landing-review/
 /artikel-hook-konten-kol.md
