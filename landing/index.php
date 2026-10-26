@@ -7,11 +7,18 @@
  */
 
 // Otomatis buat shortcut (symlink) ke campaign & datahub jika belum ada (Zero-Touch Deployment)
-if (!file_exists(__DIR__ . '/campaign') && is_dir(__DIR__ . '/../campaign')) {
-    @symlink('../campaign', __DIR__ . '/campaign');
-}
-if (!file_exists(__DIR__ . '/datahub') && is_dir(__DIR__ . '/../datahub')) {
-    @symlink('../datahub', __DIR__ . '/datahub');
+foreach (['campaign', 'datahub'] as $target) {
+    $linkPath = __DIR__ . '/' . $target;
+    $targetDir = __DIR__ . '/../' . $target;
+
+    // Jika target ../campaign atau ../datahub ada, tapi link di landing/ bukan directory/link yang valid
+    if (is_dir($targetDir) && (!is_link($linkPath) || !is_dir($linkPath))) {
+        // Hapus file text dummy hasil ekstrak zip / git windows
+        if (file_exists($linkPath) || is_link($linkPath)) {
+            @unlink($linkPath);
+        }
+        @symlink('../' . $target, $linkPath);
+    }
 }
 
 /*

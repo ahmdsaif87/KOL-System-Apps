@@ -78,6 +78,9 @@ class Artikel_api
         curl_close($ch);
 
         if ($curl_code !== 0) {
+            if (ENVIRONMENT === 'development') {
+                return $this->get_mock_feed($path);
+            }
             throw new Artikel_api_exception("Koneksi API gagal: {$curl_err}", $curl_code);
         }
 
@@ -233,5 +236,73 @@ class Artikel_api
         }
 
         return $articles;
+    }
+
+    /**
+     * Data mock untuk development lokal ketika backend campaign tidak dinyalakan.
+     * Menghindari error 503 saat testing frontend di lokal.
+     *
+     * @param string $path
+     * @return object|null
+     */
+    protected function get_mock_feed($path = '')
+    {
+        $articles = array(
+            (object) array(
+                'id' => 1,
+                'title' => 'Panduan Lengkap Influencer Marketing untuk Brand di 2026',
+                'slug' => 'panduan-influencer-marketing-brand-2026',
+                'category' => 'Strategy',
+                'author' => 'Tim Riset KOLAB',
+                'published_at_label' => '24 Okt 2026',
+                'cover_image_url' => '',
+                'excerpt' => 'Pelajari cara memilih KOL yang tepat, mengukur ROI secara presisi, dan menghindari vanity metrics dalam kampanye digital.',
+                'content' => '<p>Influencer marketing kini telah bertransformasi menjadi salah satu pilar strategi pemasaran terpenting bagi brand enterprise. Menghubungkan produk dengan kreator yang tepat terbukti meningkatkan konversi hingga 3x lipat dibandingkan iklan konvensional.</p><p>Kunci sukses kampanye influencer terletak pada integrasi data performa historis dan manajemen alur kerja yang rapi mulai dari brief hingga pembayaran.</p>',
+            ),
+            (object) array(
+                'id' => 2,
+                'title' => 'Cara Menghitung Rate Card KOL Berdasarkan Engagement Rate',
+                'slug' => 'cara-menghitung-rate-card-kol-engagement-rate',
+                'category' => 'Analytics',
+                'author' => 'Data Analyst',
+                'published_at_label' => '20 Okt 2026',
+                'cover_image_url' => '',
+                'excerpt' => 'Benchmark harga kreator di TikTok dan Instagram agar budget campaign Anda lebih efisien dan tepat sasaran.',
+                'content' => '<p>Menghitung rate card tidak cukup hanya melihat jumlah followers. Engagement rate dan konsistensi views video adalah metrik utama yang menentukan keberhasilan pesan promosi tersampaikan.</p>',
+            ),
+            (object) array(
+                'id' => 3,
+                'title' => 'Manajemen Kontrak Digital dan Review Draft Tanpa Ribet',
+                'slug' => 'manajemen-kontrak-digital-review-draft',
+                'category' => 'Workflow',
+                'author' => 'Operations',
+                'published_at_label' => '15 Okt 2026',
+                'cover_image_url' => '',
+                'excerpt' => 'Otomatisasi pengiriman brief, approval naskah video, dan tracking resi pengiriman sampel dalam satu dashboard.',
+                'content' => '<p>Seringkali miskomunikasi terjadi di tahap revisi draft. Menggunakan sistem terpusat memastikan setiap feedback terdokumentasi dan dapat dilacak dengan mudah oleh kedua belah pihak.</p>',
+            ),
+        );
+
+        if (strpos($path, 'articles/feed/') === 0) {
+            $slug = substr($path, 14);
+            foreach ($articles as $item) {
+                if ($item->slug === $slug) {
+                    return (object) array('success' => true, 'data' => $item);
+                }
+            }
+            return null;
+        }
+
+        return (object) array(
+            'success' => true,
+            'data'    => $articles,
+            'meta'    => (object) array(
+                'page'        => 1,
+                'per_page'    => 9,
+                'total'       => count($articles),
+                'total_pages' => 1,
+                'categories'  => array('Strategy', 'Analytics', 'Workflow'),
+            ),
+        );
     }
 }
