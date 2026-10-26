@@ -55,7 +55,7 @@
 
       <!-- Bottom bar -->
       <div class="flex flex-col items-start justify-between gap-4 border-t border-[rgba(226,232,240,0.6)] pt-6 sm:flex-row sm:items-center">
-        <p class="text-sm leading-5 text-[#737686]">© <span id="year"><?= date('Y') ?></span> PT Kolaborasi Kreasi Nusantara (KOLAB.ID). Hak Cipta Dilindungi Undang-Undang.</p>
+        <p class="text-sm leading-5 text-[#737686]">© <span id="year"><?= date('Y') ?></span> IDMETAFORA. All Rights Reserved</p>
         <nav class="flex flex-wrap gap-6" aria-label="Tautan legal">
           <a href="<?= base_url('/#demo') ?>" class="text-sm leading-5 text-[#737686] hover:text-ink">Syarat &amp; Ketentuan</a>
           <a href="<?= base_url('/#demo') ?>" class="text-sm leading-5 text-[#737686] hover:text-ink">Pusat Privasi Data</a>

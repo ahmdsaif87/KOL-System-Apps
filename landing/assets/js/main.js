@@ -219,5 +219,31 @@
       }
     });
   });
+
+  // ===== SCROLL-DRIVEN REVEAL MOTION =====
+  if ('IntersectionObserver' in window) {
+    const revealElements = document.querySelectorAll('.reveal-on-scroll, .reveal-stagger');
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.12,
+        rootMargin: '0px 0px -30px 0px'
+      }
+    );
+
+    revealElements.forEach((el) => revealObserver.observe(el));
+  } else {
+    document.querySelectorAll('.reveal-on-scroll, .reveal-stagger').forEach((el) => {
+      el.classList.add('is-revealed');
+    });
+  }
 })();
+
 

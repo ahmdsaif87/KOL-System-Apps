@@ -12,7 +12,11 @@ $base_url = getenv('LANDING_BASE_URL');
 if ($base_url !== false && $base_url !== '') {
     $config['base_url'] = rtrim($base_url, '/') . '/';
 } elseif (! empty($_SERVER['HTTP_HOST'])) {
-    $scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $is_https = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        || (isset($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
+        || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+    $scheme = $is_https ? 'https' : 'http';
     $script = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : '';
     $dir = rtrim(dirname($script), '/\\');
     if ($dir === '/landing' || $dir === '\\landing') {

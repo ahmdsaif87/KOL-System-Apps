@@ -2,7 +2,7 @@
   "name": "kol-landing",
   "version": "1.0.0",
   "private": true,
-  "description": "Landing page KOLAB.ID — CodeIgniter 3 + Tailwind CSS. Artikel dibaca langsung dari database KOL (read-only).",
+  "description": "Landing page KOLAB.ID — CodeIgniter 3 + Tailwind CSS. Artikel di-fetch via REST API Campaign (/campaign/articles/feed).",
   "scripts": {
     "build": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify",
     "css:watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",

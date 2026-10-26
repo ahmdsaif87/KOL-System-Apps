@@ -36,7 +36,11 @@ class Artikel_api
         $this->ci->config->load('api', TRUE, TRUE);
 
         $api_config = $this->ci->config->item('api');
-        $base = isset($api_config['articles_api_base']) ? $api_config['articles_api_base'] : 'http://localhost:8000';
+        $base = isset($api_config['articles_api_base']) ? $api_config['articles_api_base'] : '';
+
+        if ($base === '' && function_exists('base_url')) {
+            $base = base_url('campaign');
+        }
 
         $this->api_base          = rtrim($base, '/');
         $this->connect_timeout   = isset($api_config['articles_api_connect_timeout']) ? (int) $api_config['articles_api_connect_timeout'] : 2;
@@ -45,7 +49,9 @@ class Artikel_api
     }
 
     /**
-     * Eksekusi HTTP GET request via cURL ke API feed.
+     * Eksekusi request ke REST API Campaign (/articles/feed).
+     * - Di hosting (Apache/LiteSpeed/Nginx): HTTP cURL standar ke endpoint https://kolab.metaforacorp.com/campaign/articles/feed.
+     * - Di lokal php -S (single-threaded): diproses via controller Campaign langsung agar tidak terjadi deadlock cURL ke port yang sama.
      *
      * @param string $path
      * @param array $query
@@ -60,6 +66,18 @@ class Artikel_api
             $url .= '?' . http_build_query($query);
         }
 
+        // Bypass cURL deadlock khusus jika berjalan di php -S built-in server lokal pada port yang sama
+        if (php_sapi_name() === 'cli-server' && $this->is_local_request($url)) {
+            $local_res = $this->request_local_campaign($path, $query);
+            if ($local_res !== null) {
+                return $local_res;
+            }
+            if ($allow_404) {
+                return null;
+            }
+        }
+
+        // HTTP cURL request standar (produksi / hosting)
         $ch = curl_init();
         curl_setopt_array($ch, array(
             CURLOPT_URL            => $url,
@@ -78,10 +96,7 @@ class Artikel_api
         curl_close($ch);
 
         if ($curl_code !== 0) {
-            if (ENVIRONMENT === 'development') {
-                return $this->get_mock_feed($path);
-            }
-            throw new Artikel_api_exception("Koneksi API gagal: {$curl_err}", $curl_code);
+            throw new Artikel_api_exception("HTTP API request failed: {$curl_err}", $curl_code);
         }
 
         if ($http_code === 404 && $allow_404) {
@@ -89,20 +104,76 @@ class Artikel_api
         }
 
         if ($http_code < 200 || $http_code >= 300) {
-            throw new Artikel_api_exception("API merespons status HTTP {$http_code}", $http_code);
+            throw new Artikel_api_exception("API status code {$http_code}", $http_code);
         }
 
         $decoded = json_decode($response, false);
         if (json_last_error() !== JSON_ERROR_NONE || ! is_object($decoded)) {
-            throw new Artikel_api_exception('Respons API bukan JSON yang valid');
+            throw new Artikel_api_exception('Format JSON dari API tidak valid');
         }
 
         if (empty($decoded->success) || $decoded->success !== true) {
-            $msg = isset($decoded->message) ? $decoded->message : 'Operasi API tidak berhasil';
+            $msg = isset($decoded->message) ? $decoded->message : 'API Campaign merespons error';
             throw new Artikel_api_exception($msg);
         }
 
+        $this->normalize_api_output($decoded);
+
         return $decoded;
+    }
+
+    /**
+     * Eksekusi controller REST API Campaign di lokal (tanpa deadlock php -S).
+     * Output murni dari controller Campaign (campaign/modules/articles/controllers/Articles.php).
+     */
+    protected function request_local_campaign($path, array $query = array())
+    {
+        $campaign_dir = dirname(FCPATH) . '/campaign';
+        $index_file   = $campaign_dir . '/index.php';
+
+        if (! is_file($index_file)) {
+            return null;
+        }
+
+        $slug = '';
+        if (strpos($path, 'articles/feed/') === 0) {
+            $slug = substr($path, 14);
+        }
+
+        $get_export = var_export($query, true);
+        $slug_arg   = $slug !== '' ? ' ' . escapeshellarg($slug) : '';
+        $php_bin    = PHP_BINARY && is_executable(PHP_BINARY) ? PHP_BINARY : 'php';
+
+        $code = '$_GET = ' . $get_export . '; include ' . var_export($index_file, true) . ';';
+        $cmd  = sprintf(
+            'cd %s && %s -r %s articles feed%s 2>/dev/null',
+            escapeshellarg($campaign_dir),
+            escapeshellarg($php_bin),
+            escapeshellarg($code),
+            $slug_arg
+        );
+
+        $output = shell_exec($cmd);
+        if ($output === null || trim($output) === '') {
+            return null;
+        }
+
+        $decoded = json_decode(trim($output), false);
+        if (json_last_error() !== JSON_ERROR_NONE || ! is_object($decoded) || empty($decoded->success)) {
+            return null;
+        }
+
+        $this->normalize_api_output($decoded);
+        return $decoded;
+    }
+
+    /**
+     * Deteksi apakah target request adalah localhost / server sendiri.
+     */
+    protected function is_local_request($url)
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+        return in_array($host, array('localhost', '127.0.0.1', '::1'), true);
     }
 
     /**
@@ -239,70 +310,26 @@ class Artikel_api
     }
 
     /**
-     * Data mock untuk development lokal ketika backend campaign tidak dinyalakan.
-     * Menghindari error 503 saat testing frontend di lokal.
-     *
-     * @param string $path
-     * @return object|null
+     * Normalisasi cover_image_url agar selalu mengarah ke URL Campaign yang aktif.
      */
-    protected function get_mock_feed($path = '')
+    protected function normalize_api_output($decoded)
     {
-        $articles = array(
-            (object) array(
-                'id' => 1,
-                'title' => 'Panduan Lengkap Influencer Marketing untuk Brand di 2026',
-                'slug' => 'panduan-influencer-marketing-brand-2026',
-                'category' => 'Strategy',
-                'author' => 'Tim Riset KOLAB',
-                'published_at_label' => '24 Okt 2026',
-                'cover_image_url' => '',
-                'excerpt' => 'Pelajari cara memilih KOL yang tepat, mengukur ROI secara presisi, dan menghindari vanity metrics dalam kampanye digital.',
-                'content' => '<p>Influencer marketing kini telah bertransformasi menjadi salah satu pilar strategi pemasaran terpenting bagi brand enterprise. Menghubungkan produk dengan kreator yang tepat terbukti meningkatkan konversi hingga 3x lipat dibandingkan iklan konvensional.</p><p>Kunci sukses kampanye influencer terletak pada integrasi data performa historis dan manajemen alur kerja yang rapi mulai dari brief hingga pembayaran.</p>',
-            ),
-            (object) array(
-                'id' => 2,
-                'title' => 'Cara Menghitung Rate Card KOL Berdasarkan Engagement Rate',
-                'slug' => 'cara-menghitung-rate-card-kol-engagement-rate',
-                'category' => 'Analytics',
-                'author' => 'Data Analyst',
-                'published_at_label' => '20 Okt 2026',
-                'cover_image_url' => '',
-                'excerpt' => 'Benchmark harga kreator di TikTok dan Instagram agar budget campaign Anda lebih efisien dan tepat sasaran.',
-                'content' => '<p>Menghitung rate card tidak cukup hanya melihat jumlah followers. Engagement rate dan konsistensi views video adalah metrik utama yang menentukan keberhasilan pesan promosi tersampaikan.</p>',
-            ),
-            (object) array(
-                'id' => 3,
-                'title' => 'Manajemen Kontrak Digital dan Review Draft Tanpa Ribet',
-                'slug' => 'manajemen-kontrak-digital-review-draft',
-                'category' => 'Workflow',
-                'author' => 'Operations',
-                'published_at_label' => '15 Okt 2026',
-                'cover_image_url' => '',
-                'excerpt' => 'Otomatisasi pengiriman brief, approval naskah video, dan tracking resi pengiriman sampel dalam satu dashboard.',
-                'content' => '<p>Seringkali miskomunikasi terjadi di tahap revisi draft. Menggunakan sistem terpusat memastikan setiap feedback terdokumentasi dan dapat dilacak dengan mudah oleh kedua belah pihak.</p>',
-            ),
-        );
-
-        if (strpos($path, 'articles/feed/') === 0) {
-            $slug = substr($path, 14);
-            foreach ($articles as $item) {
-                if ($item->slug === $slug) {
-                    return (object) array('success' => true, 'data' => $item);
-                }
-            }
-            return null;
+        if (empty($decoded->data)) {
+            return;
         }
 
-        return (object) array(
-            'success' => true,
-            'data'    => $articles,
-            'meta'    => (object) array(
-                'page'        => 1,
-                'per_page'    => 9,
-                'total'       => count($articles),
-                'total_pages' => 1,
-                'categories'  => array('Strategy', 'Analytics', 'Workflow'),
-            ),
-        );
+        $campaign_base = $this->api_base;
+
+        if (is_array($decoded->data)) {
+            foreach ($decoded->data as &$item) {
+                if (! empty($item->cover_image_url) && strpos($item->cover_image_url, 'http://localhost/uploads/') === 0) {
+                    $item->cover_image_url = $campaign_base . '/uploads/' . substr($item->cover_image_url, 24);
+                }
+            }
+        } elseif (is_object($decoded->data)) {
+            if (! empty($decoded->data->cover_image_url) && strpos($decoded->data->cover_image_url, 'http://localhost/uploads/') === 0) {
+                $decoded->data->cover_image_url = $campaign_base . '/uploads/' . substr($decoded->data->cover_image_url, 24);
+            }
+        }
     }
 }

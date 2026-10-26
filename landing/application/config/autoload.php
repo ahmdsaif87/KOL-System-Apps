@@ -5,8 +5,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |--------------------------------------------------------------------------
 | Autoload
 |--------------------------------------------------------------------------
-| Database sengaja TIDAK di-autoload. Hanya controller yang butuh artikel
-| yang memuat model (dan koneksi DB) — halaman statis tetap ringan.
+| Landing sepenuhnya mengonsumsi REST API (/campaign/articles/feed) via cURL,
+| tidak memiliki koneksi maupun konfigurasi database langsung.
 */
 $autoload['packages'] = array();
 $autoload['libraries'] = array();
