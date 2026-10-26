@@ -54,9 +54,14 @@ $canonical       = isset($canonical) ? $canonical : current_url();
         <a href="<?= base_url('/#demo') ?>" class="text-sm font-medium tracking-[0.14px] text-body hover:text-ink">Demo</a>
       </nav>
 
-      <a href="<?= base_url('/#demo') ?>" class="hidden h-11 items-center justify-center rounded-lg bg-black px-6 text-sm font-medium tracking-[0.14px] text-white drop-shadow-[0px_1px_1.5px_rgba(15,23,42,0.04)] hover:bg-slate-800 md:flex">
-        Hubungi Kami
-      </a>
+      <div class="hidden items-center gap-3 md:flex">
+        <a href="<?= base_url('login') ?>" class="inline-flex h-11 items-center justify-center rounded-lg border <?= $active === 'login' ? 'border-brand text-brand bg-slate-50' : 'border-slate-300 bg-white text-ink' ?> px-5 text-sm font-semibold transition hover:border-brand hover:bg-slate-50 hover:text-brand">
+          Masuk
+        </a>
+        <a href="<?= base_url('/#demo') ?>" class="inline-flex h-11 items-center justify-center rounded-lg bg-black px-6 text-sm font-medium tracking-[0.14px] text-white drop-shadow-[0px_1px_1.5px_rgba(15,23,42,0.04)] hover:bg-slate-800">
+          Hubungi Kami
+        </a>
+      </div>
 
       <button id="nav-toggle" type="button" class="rounded-md p-2 text-body hover:bg-slate-100 md:hidden"
               aria-controls="nav-menu" aria-expanded="false" aria-label="Buka menu">
@@ -77,7 +82,10 @@ $canonical       = isset($canonical) ? $canonical : current_url();
         <a href="<?= base_url('artikel') ?>" class="<?= $active === 'artikel' ? 'font-semibold text-brand' : 'hover:text-ink' ?>"<?= $active === 'artikel' ? ' aria-current="page"' : '' ?>>Artikel</a>
         <a href="<?= base_url('/#faq') ?>" class="hover:text-ink">FAQ</a>
         <a href="<?= base_url('/#demo') ?>" class="hover:text-ink">Demo</a>
-        <a href="<?= base_url('/#demo') ?>" class="inline-flex h-11 w-fit items-center justify-center rounded-lg bg-black px-6 text-white">Hubungi Kami</a>
+        <div class="mt-2 flex flex-col gap-2 pt-2 border-t border-slate-100">
+          <a href="<?= base_url('login') ?>" class="inline-flex h-11 w-full items-center justify-center rounded-lg border <?= $active === 'login' ? 'border-brand text-brand bg-slate-50' : 'border-slate-300 bg-white text-ink' ?> text-sm font-semibold hover:bg-slate-50 hover:text-brand">Masuk</a>
+          <a href="<?= base_url('/#demo') ?>" class="inline-flex h-11 w-full items-center justify-center rounded-lg bg-black text-sm font-medium text-white hover:bg-slate-800">Hubungi Kami</a>
+        </div>
       </div>
     </nav>
   </header>

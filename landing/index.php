@@ -6,6 +6,14 @@
  * Campaign (/articles/feed). Tidak ada operasi database langsung.
  */
 
+// Otomatis buat shortcut (symlink) ke campaign & datahub jika belum ada (Zero-Touch Deployment)
+if (!file_exists(__DIR__ . '/campaign') && is_dir(__DIR__ . '/../campaign')) {
+    @symlink('../campaign', __DIR__ . '/campaign');
+}
+if (!file_exists(__DIR__ . '/datahub') && is_dir(__DIR__ . '/../datahub')) {
+    @symlink('../datahub', __DIR__ . '/datahub');
+}
+
 /*
  *---------------------------------------------------------------
  * APPLICATION ENVIRONMENT

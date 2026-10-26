@@ -1,58 +1,19 @@
-# KOLAB.ID Landing — CI3
+# KOLAB.ID Landing — CI3 Standard
 DirectoryIndex index.php
 
-# Environment produksi (Apache/LiteSpeed membaca .htaccess; dev php -S tidak).
-# Set secondary nilai LANDING_API_BASE sesuai domain campaign hasil konfirmasi IT.
-SetEnv CI_ENV production
-# SetEnv LANDING_API_BASE https://app.kolab.id
-
-Options -Indexes
+Options -Indexes +FollowSymLinks
 AddDefaultCharset UTF-8
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-
-    # Paksa HTTPS (aktifkan di produksi)
-    RewriteCond %{HTTPS} off
-    RewriteCond %{HTTP_HOST} !^localhost [NC]
-    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1
-    RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
-
-    # Front controller CI3
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ index.php?/$1 [L,QSA]
 </IfModule>
 
-# Folder aplikasi & source tidak boleh diakses langsung
-RedirectMatch 404 ^/(application|system|node_modules|src)(/|$)
+# Keamanan folder sistem & file sensitif
+RedirectMatch 404 ^/(application|system)(/|$)
 
 <FilesMatch "^(composer\.(json|lock)|package(-lock)?\.json|README\.md|\.gitignore|\.htaccess)$">
     Require all denied
 </FilesMatch>
-
-<FilesMatch "^\.">
-    Require all denied
-</FilesMatch>
-
-# Cache & log tidak boleh dibuka
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set Referrer-Policy "strict-origin-when-cross-origin"
-</IfModule>
-
-# Aset statis: cache panjang
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresByType text/css "access plus 1 year"
-    ExpiresByType application/javascript "access plus 1 year"
-    ExpiresByType image/png "access plus 1 year"
-    ExpiresByType image/svg+xml "access plus 1 year"
-    ExpiresByType image/webp "access plus 1 year"
-    ExpiresByType font/woff2 "access plus 1 year"
-</IfModule>
-
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
-</IfModule>
