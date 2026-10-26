@@ -15,6 +15,9 @@ if ($base_url !== false && $base_url !== '') {
     $scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $script = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : '';
     $dir = rtrim(dirname($script), '/\\');
+    if ($dir === '/landing' || $dir === '\\landing') {
+        $dir = '';
+    }
     $config['base_url'] = $scheme . '://' . $_SERVER['HTTP_HOST'] . ($dir !== '' ? $dir : '') . '/';
 } else {
     $config['base_url'] = 'http://localhost:8087/';

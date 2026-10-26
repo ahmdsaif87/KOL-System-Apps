@@ -92,8 +92,8 @@ $script_name = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : 'index
 $server_name = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost';
 $server_port = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : '80';
 
-$fo = str_replace("index.php","", $script_name);
-$base = "$http" . $server_name . ":" . $server_port . "" . $fo;
+$port_str = in_array($server_port, array('80', '443')) ? '' : ':' . $server_port;
+$base = "$http" . $server_name . $port_str . $fo;
 
 defined('BASE_URL') 			OR define('BASE_URL'			, $base);
 defined('BASE_ASSET') 			OR define('BASE_ASSET'			, BASE_URL . 'asset/');
