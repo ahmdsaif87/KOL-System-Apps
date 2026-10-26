@@ -90,6 +90,7 @@ defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest auto
 //CUSTOM
 if (PHP_SAPI !== 'cli') {
     $http = 'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 's' : '') . '://';
+    $fo = str_replace("index.php", "", $_SERVER['SCRIPT_NAME']);
     $port = (isset($_SERVER['SERVER_PORT']) && !in_array($_SERVER['SERVER_PORT'], array('80', '443'))) ? ':' . $_SERVER['SERVER_PORT'] : '';
     $base = "$http" . $_SERVER['SERVER_NAME'] . $port . $fo;
 } else {

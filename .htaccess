@@ -1,34 +1,14 @@
-# =====================================================================
-# KOLAB.ID Monorepo Root Router (.htaccess)
-# Docroot: Parent Folder
-#   /           -> landing/
-#   /campaign   -> campaign/
-#   /datahub    -> datahub/
-# =====================================================================
-DirectoryIndex landing/index.php index.php
-
-Options -Indexes +FollowSymLinks
-AddDefaultCharset UTF-8
-
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # 1. Biarkan request ke sub-aplikasi fisik (campaign/ & datahub/) langsung diproses
+    # Aset statis landing
+    RewriteRule ^(assets|dist)/(.*)$ landing/$1/$2 [L]
+
+    # Sub-aplikasi fisik (campaign & datahub)
     RewriteRule ^(campaign|datahub)(/.*)?$ - [L]
 
-    # 2. Aset statis landing (assets, dist, favicon, robots.txt, sitemap)
-    RewriteRule ^(assets|dist)/(.*)$ landing/$1/$2 [L]
-    RewriteRule ^(favicon\.(ico|png)|robots\.txt|sitemap\.xml)$ landing/$1 [L]
-
-    # 3. Semua request halaman web lainnya (/, /artikel, /login, dll.) dialihkan ke landing/index.php
-    RewriteCond %{REQUEST_URI} !^/landing/
-    RewriteRule ^(.*)$ landing/index.php?/$1 [L,QSA]
+    # Route utama ke landing
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ landing/index.php?/$1 [L]
 </IfModule>
-
-# Keamanan: Blokir akses langsung ke file sensitif di parent folder dari web
-<FilesMatch "\.(sql|sh|yml|md|env|example\.php)$">
-    Require all denied
-</FilesMatch>
-
-# Blokir folder konfigurasi internal & git
-RedirectMatch 404 ^/(config-private|shared|\.git)(/|$)
