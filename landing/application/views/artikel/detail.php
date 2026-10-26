@@ -27,11 +27,16 @@
               <time datetime="<?= html_escape(! empty($artikel->published_at) ? $artikel->published_at : '') ?>"><?= html_escape($date_label) ?></time>
             </div>
 
-            <?php if ($cover): ?>
-              <div class="mt-8 overflow-hidden rounded-2xl bg-mist shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]">
-                <img src="<?= html_escape($cover) ?>" alt="<?= html_escape($artikel->title) ?>" class="h-auto w-full object-cover">
-              </div>
-            <?php endif; ?>
+            <?php 
+              $fallback = base_url('assets/images/article-placeholder.png');
+              $img_src  = ! empty($cover) ? $cover : $fallback;
+            ?>
+            <div class="mt-8 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]">
+              <img src="<?= html_escape($img_src) ?>" 
+                   alt="<?= html_escape($artikel->title) ?>" 
+                   onerror="this.onerror=null; this.src='<?= $fallback ?>';" 
+                   class="h-auto w-full object-cover">
+            </div>
 
             <?php if (! empty($artikel->excerpt)): ?>
               <p class="mt-8 border-l-4 border-brand/30 pl-5 text-lg font-medium leading-8 text-body"><?= html_escape($artikel->excerpt) ?></p>

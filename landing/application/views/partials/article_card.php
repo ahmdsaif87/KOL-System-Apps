@@ -2,20 +2,19 @@
 /**
  * Kartu artikel. Variabel: $item (row artikel dari API).
  */
-$href   = base_url('artikel/' . rawurlencode($item->slug));
-$cover  = ! empty($item->cover_image_url) ? $item->cover_image_url : null;
-$date   = ! empty($item->published_at_label) ? $item->published_at_label : '';
-$author = ! empty($item->author) ? $item->author : 'Admin';
+$href     = base_url('artikel/' . rawurlencode($item->slug));
+$fallback = base_url('assets/images/article-placeholder.png');
+$cover    = ! empty($item->cover_image_url) ? $item->cover_image_url : $fallback;
+$date     = ! empty($item->published_at_label) ? $item->published_at_label : '';
+$author   = ! empty($item->author) ? $item->author : 'Admin';
 ?>
 <a href="<?= $href ?>" class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] transition duration-300 hover:-translate-y-1 hover:shadow-[0px_18px_30px_-12px_rgba(23,43,77,0.25)]">
-  <div class="block aspect-[16/9] overflow-hidden bg-mist">
-    <?php if ($cover): ?>
-      <img src="<?= html_escape($cover) ?>" alt="<?= html_escape($item->title) ?>" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
-    <?php else: ?>
-      <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#dbe1ff] via-[#eff4ff] to-[#d3e4fe]">
-        <img src="<?= base_url('assets/images/kolab-logo.png') ?>" alt="" class="h-10 opacity-80">
-      </div>
-    <?php endif; ?>
+  <div class="block aspect-[16/9] overflow-hidden bg-slate-50 border-b border-slate-100">
+    <img src="<?= html_escape($cover) ?>" 
+         alt="<?= html_escape($item->title) ?>" 
+         loading="lazy" 
+         onerror="this.onerror=null; this.src='<?= $fallback ?>';" 
+         class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
   </div>
   <div class="flex flex-1 flex-col p-6 sm:p-8">
     <span class="text-[11px] font-bold uppercase leading-[14px] tracking-[0.55px] text-brand"><?= html_escape(! empty($item->category) ? $item->category : 'Artikel') ?></span>

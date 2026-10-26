@@ -244,6 +244,20 @@
       el.classList.add('is-revealed');
     });
   }
+
+  // ===== FALLBACK GAMBAR ARTIKEL (JIKA GAGAL LOAD) =====
+  document.addEventListener('error', (e) => {
+    const target = e.target;
+    if (target && target.tagName === 'IMG') {
+      const isArticleImg = target.closest('#artikel, #articles-content, article, .group');
+      if (isArticleImg) {
+        const fallback = target.dataset.fallback || ((window.location.origin || '') + '/assets/images/article-placeholder.png');
+        if (target.src !== fallback) {
+          target.src = fallback;
+        }
+      }
+    }
+  }, true);
 })();
 
 

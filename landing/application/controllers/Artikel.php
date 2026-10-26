@@ -121,7 +121,7 @@ class Artikel extends MY_Controller
             'meta_title'       => ! empty($artikel->meta_title) ? $artikel->meta_title : $artikel->title . ' — KOLAB.ID',
             'meta_description' => ! empty($artikel->meta_description) ? $artikel->meta_description : (string) $artikel->excerpt,
             'og_type'          => 'article',
-            'og_image'         => $cover ? $cover : base_url('assets/images/hero-mockup.png'),
+            'og_image'         => $cover ? $cover : base_url('assets/images/article-placeholder.png'),
             'canonical'        => base_url('artikel/' . $artikel->slug),
             'artikel'          => $artikel,
             'cover'            => $cover,
@@ -135,7 +135,7 @@ class Artikel extends MY_Controller
                 '@type'            => 'Article',
                 'headline'         => $artikel->title,
                 'description'      => ! empty($artikel->meta_description) ? $artikel->meta_description : (string) $artikel->excerpt,
-                'image'            => $cover ? array($cover) : array(base_url('assets/images/hero-mockup.png')),
+                'image'            => $cover ? array($cover) : array(base_url('assets/images/article-placeholder.png')),
                 'datePublished'    => $published_iso,
                 'dateModified'     => $published_iso,
                 'author'           => array(
