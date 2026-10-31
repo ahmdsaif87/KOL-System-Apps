@@ -5,7 +5,7 @@ class Model_audit_logs extends MY_Model {
 
     private $primary_key    = 'id';
     private $table_name     = 'audit_logs';
-    private $field_search   = ['user_id', 'entity_type', 'entity_id', 'action', 'old_values', 'new_values', 'created_at'];
+    private $field_search   = ['brand_id', 'user_id', 'entity_type', 'entity_id', 'action', 'old_values', 'new_values', 'created_at'];
 
     public function __construct()
     {

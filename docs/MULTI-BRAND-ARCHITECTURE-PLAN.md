@@ -1,4 +1,4 @@
-# Spesifikasi & Rencana Implementasi: Arsitektur Multi Brand (Satu Sistem, Banyak Brand)
+﻿# Spesifikasi & Rencana Implementasi: Arsitektur Multi Brand (Satu Sistem, Banyak Brand)
 
 Dokumen ini adalah spesifikasi arsitektur teknis dan panduan implementasi untuk mentransformasi sistem **KOLAB.ID (KOL-System-Apps)** dari model *single-brand* (yang saat ini berpusat pada satu brand "Metafora") menjadi arsitektur **Multi Brand terisolasi (Single Database Scoped Tenancy)** di CodeIgniter 3.
 
@@ -141,8 +141,14 @@ PREPARE alterIfNotExists FROM @preparedStatement;
 EXECUTE alterIfNotExists;
 DEALLOCATE PREPARE alterIfNotExists;
 
--- Hubungkan tim operasional & leader eksisting ke Brand 1
-UPDATE `aauth_users` SET `brand_id` = 1 WHERE `id` IN (24, 25, 37, 38);
+-- ==============================================================================
+-- CATATAN IMPLEMENTASI: Hubungkan user eksisting ke Brand 1
+-- JANGAN gunakan id IN (24,25,37,38) karena ID bersifat environment-specific.
+-- Gunakan script seed terpisah (seed/brand1_users.sql) dengan WHERE username.
+-- Contoh untuk dijalankan secara manual SETELAH migrasi utama:
+--   UPDATE `aauth_users` SET `brand_id` = 1
+--   WHERE `username` IN ('nama_user_1', 'nama_user_2', 'nama_user_3');
+-- ==============================================================================
 
 -- ==============================================================================
 -- 4. SCOPING KAMPANYE (campaigns.brand_id)
@@ -220,20 +226,140 @@ SELECT 'brands_view', 'View Brands' WHERE NOT EXISTS (SELECT 1 FROM `aauth_perms
 
 INSERT IGNORE INTO `aauth_perm_to_group` (`perm_id`, `group_id`)
 SELECT id, 1 FROM `aauth_perms` WHERE `name` LIKE 'brands_%';
+
+-- ==============================================================================
+-- 10. FOREIGN KEY CONSTRAINTS (Referential Integrity)
+-- Kebijakan: ON DELETE RESTRICT mencegah penghapusan brand yang masih punya data.
+-- ON UPDATE CASCADE memastikan jika id brand berubah, semua FK ikut terupdate.
+-- contract_templates & aauth_users menggunakan ON DELETE SET NULL karena brand_id
+-- di tabel tersebut boleh NULL (global template / Superadmin).
+-- ==============================================================================
+
+-- FK: campaigns -> brands
+SET @fk_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+  WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'campaigns' AND CONSTRAINT_NAME = 'fk_campaigns_brand_id');
+SET @sql = IF(@fk_exists = 0,
+  'ALTER TABLE `campaigns` ADD CONSTRAINT `fk_campaigns_brand_id` FOREIGN KEY (`brand_id`) REFERENCES `brands`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- FK: products -> brands
+SET @fk_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+  WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'products' AND CONSTRAINT_NAME = 'fk_products_brand_id');
+SET @sql = IF(@fk_exists = 0,
+  'ALTER TABLE `products` ADD CONSTRAINT `fk_products_brand_id` FOREIGN KEY (`brand_id`) REFERENCES `brands`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- FK: contract_templates -> brands (NULL = template global untuk semua brand)
+SET @fk_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+  WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'contract_templates' AND CONSTRAINT_NAME = 'fk_contract_templates_brand_id');
+SET @sql = IF(@fk_exists = 0,
+  'ALTER TABLE `contract_templates` ADD CONSTRAINT `fk_contract_templates_brand_id` FOREIGN KEY (`brand_id`) REFERENCES `brands`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- FK: aauth_users -> brands (NULL = Superadmin, tidak terikat brand)
+SET @fk_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+  WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'aauth_users' AND CONSTRAINT_NAME = 'fk_aauth_users_brand_id');
+SET @sql = IF(@fk_exists = 0,
+  'ALTER TABLE `aauth_users` ADD CONSTRAINT `fk_aauth_users_brand_id` FOREIGN KEY (`brand_id`) REFERENCES `brands`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- ==============================================================================
+-- 11. BRAND DEACTIVATION LIFECYCLE
+-- Kebijakan saat brand dinonaktifkan (is_active = 0):
+--   a) Login user yang ter-scoped ke brand tersebut DIBLOK (lihat My_Controller).
+--   b) Data campaigns, products, contracts TIDAK dihapus — hanya disembunyikan.
+--   c) Superadmin tetap dapat melihat data brand inaktif via "All Brands" view.
+-- Kolom deleted_at ditambah untuk mendukung soft-delete di masa depan.
+-- ==============================================================================
+SET @col = 'deleted_at';
+SET @tbl = 'brands';
+SET @preparedStatement = (SELECT IF(
+  (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = @tbl AND COLUMN_NAME = @col) > 0,
+  'SELECT 1',
+  'ALTER TABLE `brands` ADD COLUMN `deleted_at` datetime DEFAULT NULL AFTER `updated_at`, ADD KEY `idx_brands_deleted_at` (`deleted_at`);'
+));
+PREPARE alterIfNotExists FROM @preparedStatement;
+EXECUTE alterIfNotExists;
+DEALLOCATE PREPARE alterIfNotExists;
+
+-- ==============================================================================
+-- 12. PERMISSION FINANCE: Akses Data Sensitif KOL (Rekening Bank, NIK, NPWP)
+-- Template: gating di view menggunakan $this->aauth->is_allowed('kols_view_bank_detail')
+-- Hanya Finance / Superadmin yang boleh melihat data ini.
+-- ==============================================================================
+INSERT INTO `aauth_perms` (`name`, `definition`)
+SELECT 'kols_view_bank_detail', 'View KOL Sensitive Data: Bank Account, NIK, NPWP'
+WHERE NOT EXISTS (SELECT 1 FROM `aauth_perms` WHERE `name` = 'kols_view_bank_detail');
+
+-- ==============================================================================
+-- 13. TAMBAH brand_id KE TABEL audit_logs
+-- Memungkinkan filtering audit log per brand di dashboard Superadmin.
+-- ==============================================================================
+SET @col = 'brand_id';
+SET @tbl = 'audit_logs';
+SET @preparedStatement = (SELECT IF(
+  (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = @tbl AND COLUMN_NAME = @col) > 0,
+  'SELECT 1',
+  'ALTER TABLE `audit_logs` ADD COLUMN `brand_id` bigint(20) unsigned DEFAULT NULL AFTER `user_id`, ADD KEY `idx_audit_logs_brand_id` (`brand_id`);'
+));
+PREPARE alterIfNotExists FROM @preparedStatement;
+EXECUTE alterIfNotExists;
+DEALLOCATE PREPARE alterIfNotExists;
+
+-- Berikan permission ke Superadmin (group 1). Finance group harus dibuat terpisah.
+INSERT IGNORE INTO `aauth_perm_to_group` (`perm_id`, `group_id`)
+SELECT id, 1 FROM `aauth_perms` WHERE `name` = 'kols_view_bank_detail';
 ```
+
 
 ---
 
 ## 4. Rincian Implementasi per Komponen
 
-### A. Core & Helper Layer (`app_helper.php` & `My_Controller.php`)
-- `get_user_brand_id($user_id = null)`: Mendeteksi `brand_id` user yang login dari `aauth_users`.
-- `get_active_brand_id()`:
-  - Untuk user scoped (Staff/Leader Brand X): Selalu mengembalikan `X`.
-  - Untuk Superadmin: Mengambil nilai session `active_brand_id` yang dipilih lewat switcher navbar. Jika memilih 'all', mengembalikan `null`.
-- `get_active_brand()`: Mengambil objek data baris tabel `brands` aktif saat ini.
-- `is_superadmin()`: Memvalidasi apakah user adalah Superadmin (Group 1 dan `brand_id IS NULL`).
-- `switch_brand($brand_id)`: Controller action khusus Superadmin untuk mengganti konteks session brand secara instan.
+### A. Core & Helper Layer (`app_helper.php` & `My_Model.php`) — ✅ IMPLEMENTED
+
+Helper functions added to `campaign/application/helpers/app_helper.php`:
+
+| Function | Keterangan |
+|---|---|
+| `get_user_brand_id()` | Membaca `brand_id` dari `aauth_users`. Static-cached per request untuk efisiensi. |
+| `is_superadmin()` | Validasi ganda: Group 1 admin **DAN** `brand_id IS NULL`. |
+| `get_active_brand_id()` | Mengembalikan effective brand untuk request saat ini. **Security**: session value `active_brand_id` Superadmin selalu di-validasi ulang ke DB (bukan percaya session mentah). User scoped → brand_id mereka langsung, tanpa bisa dioverride session. |
+| `get_active_brand()` | Mengembalikan full row object brand aktif (static-cached). |
+| `switch_brand()` | Khusus Superadmin: set session `active_brand_id` setelah validasi DB. Non-superadmin dikembalikan `FALSE`. |
+
+Base model methods added to `campaign/application/core/My_Model.php`:
+
+| Method | Keterangan |
+|---|---|
+| `protected  = FALSE` | Flag di model turunan. Set ke `TRUE` untuk tabel bertenant (campaigns, products, dll). |
+| `apply_brand_scope()` | Inject `WHERE brand_id = X` ke query builder. Tidak aktif jika ` = FALSE` atau Superadmin memilih "all". |
+| `assert_brand_context_for_write()` | Guard write operations — melempar `RuntimeException` jika Superadmin tidak memilih brand spesifik sebelum melakukan INSERT/UPDATE. |
+
+**Cara penggunaan di model turunan:**
+```php
+class Model_campaigns extends MY_Model {
+    protected  = TRUE; // ← aktifkan scoping
+
+    public function get_list() {
+        ->apply_brand_scope(); // ← inject WHERE brand_id
+        return ->db->get('campaigns')->result();
+    }
+
+    public function create() {
+        ->assert_brand_context_for_write(); // ← blok jika no-context
+        return ->db->insert('campaigns', );
+    }
+}
+```
 
 ### B. Modul Baru: Master Brands (`campaign/modules/brands/`)
 Menyediakan fitur pengelolaan entitas brand terpadu:
@@ -244,6 +370,14 @@ Menyediakan fitur pengelolaan entitas brand terpadu:
    - **Tabel Anggota Tim Brand**: Menampilkan seluruh user (Nama Lengkap, Username, Email, Jabatan: Leader KOL / Operational Staff, Status, Last Login).
    - **Fitur Tambah User Baru Langsung ke Brand**: Tombol modal `+ Tambah User Baru ke Brand Ini` yang membuat user langsung ke `aauth_users` dan mengaitkannya ke `brand_id` tanpa perlu keluar ke menu Pengguna terpisah.
    - Opsi *Assign Existing User* (menugaskan user yang belum memiliki brand) dan *Unassign* (melepas user dari brand).
+
+> [!NOTE]
+> **contract_templates.brand_id — Semantik NULL (Global Template)**
+> Nilai NULL pada kolom rand_id di tabel contract_templates berarti template tersebut **global** — tersedia untuk semua brand. Query pada model Model_contract_templates saat memuat daftar template untuk brand aktif harus menggunakan:
+> ``sql
+> WHERE (brand_id = {active_brand_id} OR brand_id IS NULL)
+> ``
+> Bukan hanya WHERE brand_id = {active_brand_id}. Dengan aturan ini, Brand dapat melihat MoU bawaan sistem (global) sekaligus template kustom miliknya sendiri. Saat Superadmin atau Brand membuat template baru, rand_id diisi sesuai konteks brand yang aktif.
 
 ### C. Modul KOL: Global Pool, Hapus Rate Card File & Proteksi Privasi
 1. **Pendaftaran KOL Otomatis Global**:

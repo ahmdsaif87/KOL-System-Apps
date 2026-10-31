@@ -460,7 +460,24 @@ class Admin extends MY_Controller
         
         if (!installation_complete()) {
             redirect('');
-        }      
+        }
+
+        // Multi-Brand: block login for users whose brand has been deactivated.
+        // Superadmin (brand_id IS NULL) is never blocked.
+        if (function_exists('get_user_brand_id') && $this->aauth->is_loggedin()) {
+            $scoped_brand_id = get_user_brand_id();
+            if ($scoped_brand_id !== null) {
+                $this->db->select('is_active');
+                $this->db->where('id', $scoped_brand_id);
+                $brand_row = $this->db->get('brands')->row();
+                if (!$brand_row || !$brand_row->is_active) {
+                    $this->aauth->logout();
+                    $this->session->set_flashdata('f_message', 'Akses ditolak: brand Anda sudah tidak aktif. Hubungi Administrator.');
+                    $this->session->set_flashdata('f_type', 'danger');
+                    redirect('administrator/login', 'refresh');
+                }
+            }
+        }
     }
 
 

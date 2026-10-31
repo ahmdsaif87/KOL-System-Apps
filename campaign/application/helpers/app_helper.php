@@ -1591,3 +1591,258 @@ if (!function_exists('normalize_content_type')) {
 }
 
 
+
+
+// =============================================================================
+// MULTI-BRAND TENANCY HELPERS
+// Added: 2026-10-31 | Architecture: Single-Database Scoped Tenancy
+// =============================================================================
+
+if (!function_exists('get_user_brand_id')) {
+    /**
+     * Returns the brand_id assigned to a user in aauth_users.
+     * Returns NULL for Superadmin (brand_id IS NULL = global access).
+     *
+     * @param  int|null $user_id  Defaults to the currently logged-in user.
+     * @return int|null
+     */
+    function get_user_brand_id($user_id = null)
+    {
+        $ci =& get_instance();
+        $ci->load->database();
+
+        if (!$user_id) {
+            $user_id = $ci->session->userdata('id');
+        }
+        if (!$user_id) {
+            return null;
+        }
+
+        // Use a static cache to avoid repeated DB hits per request
+        static $cache = [];
+        if (array_key_exists($user_id, $cache)) {
+            return $cache[$user_id];
+        }
+
+        $row = $ci->db->select('brand_id')
+            ->where('id', (int) $user_id)
+            ->get('aauth_users')
+            ->row();
+
+        $brand_id = ($row && $row->brand_id) ? (int) $row->brand_id : null;
+        $cache[$user_id] = $brand_id;
+
+        return $brand_id;
+    }
+}
+
+if (!function_exists('is_superadmin')) {
+    /**
+     * Returns TRUE if the current user is a Superadmin:
+     *   - Member of group ID 1 (admin), AND
+     *   - Has brand_id IS NULL in aauth_users (no brand assignment).
+     *
+     * @return bool
+     */
+    function is_superadmin()
+    {
+        $ci =& get_instance();
+        $ci->load->library('aauth');
+
+        $user_id = $ci->session->userdata('id');
+        if (!$user_id) {
+            return false;
+        }
+
+        // Must be in admin group
+        if (!$ci->aauth->is_admin()) {
+            return false;
+        }
+
+        // Must have no brand assignment (brand_id IS NULL = true global admin)
+        return get_user_brand_id($user_id) === null;
+    }
+}
+
+if (!function_exists('get_active_brand_id')) {
+    /**
+     * Returns the effective brand_id for the current request.
+     *
+     * Scoped users (Staff / Leader): always returns their own brand_id.
+     * Superadmin: reads from session 'active_brand_id'.
+     *   - If a specific brand is selected → returns that brand's validated ID.
+     *   - If 'all' or not set → returns null (global / no scope).
+     *
+     * Security: The session value is ALWAYS re-validated against the `brands`
+     * table to prevent session forgery or stale references.
+     *
+     * @return int|null  brand_id to scope queries on, or null for "all brands"
+     */
+    function get_active_brand_id()
+    {
+        $ci =& get_instance();
+        $ci->load->database();
+
+        $user_id = $ci->session->userdata('id');
+        if (!$user_id) {
+            return null;
+        }
+
+        $user_brand_id = get_user_brand_id($user_id);
+
+        // Scoped user: their brand is always authoritative, ignore session
+        if ($user_brand_id !== null) {
+            return $user_brand_id;
+        }
+
+        // Superadmin: read and validate session selection
+        $session_brand_id = $ci->session->userdata('active_brand_id');
+
+        if (!$session_brand_id || $session_brand_id === 'all') {
+            return null; // Global view
+        }
+
+        // SECURITY: Re-validate the session value against DB every request
+        // to prevent forged/stale session values from bypassing isolation
+        static $validated_brand_ids = [];
+        $key = (int) $session_brand_id;
+
+        if (!array_key_exists($key, $validated_brand_ids)) {
+            $brand = $ci->db->select('id')
+                ->where('id', $key)
+                ->where('is_active', 1)
+                ->get('brands')
+                ->row();
+
+            $validated_brand_ids[$key] = $brand ? (int) $brand->id : null;
+        }
+
+        if ($validated_brand_ids[$key] === null) {
+            // Session value points to a non-existent or inactive brand — clear it
+            $ci->session->unset_userdata('active_brand_id');
+        }
+
+        return $validated_brand_ids[$key];
+    }
+}
+
+if (!function_exists('get_active_brand')) {
+    /**
+     * Returns the full brand row object for the currently active brand,
+     * or FALSE if no brand is selected / user is Superadmin in "all" mode.
+     *
+     * @return object|false
+     */
+    function get_active_brand()
+    {
+        $brand_id = get_active_brand_id();
+        if (!$brand_id) {
+            return false;
+        }
+
+        $ci =& get_instance();
+        $ci->load->database();
+
+        static $brand_cache = [];
+        if (isset($brand_cache[$brand_id])) {
+            return $brand_cache[$brand_id];
+        }
+
+        $brand = $ci->db->where('id', $brand_id)
+            ->where('is_active', 1)
+            ->get('brands')
+            ->row();
+
+        $brand_cache[$brand_id] = $brand ?: false;
+        return $brand_cache[$brand_id];
+    }
+}
+
+if (!function_exists('switch_brand')) {
+    /**
+     * Superadmin-only: switch the active brand context stored in session.
+     * Pass 'all' to switch to the global / all-brands view.
+     *
+     * Validates the target brand_id against DB before writing to session.
+     *
+     * @param  int|string $brand_id  Target brand ID or 'all'
+     * @return bool  TRUE on success, FALSE if brand not found / not superadmin
+     */
+    function switch_brand($brand_id)
+    {
+        if (!is_superadmin()) {
+            return false; // Only superadmin may switch brand context
+        }
+
+        $ci =& get_instance();
+
+        if ($brand_id === 'all' || $brand_id === null || $brand_id === 0) {
+            $ci->session->set_userdata('active_brand_id', 'all');
+            return true;
+        }
+
+        // Validate brand exists and is active before accepting it
+        $ci->load->database();
+        $brand = $ci->db->select('id')
+            ->where('id', (int) $brand_id)
+            ->where('is_active', 1)
+            ->get('brands')
+            ->row();
+
+        if (!$brand) {
+            return false;
+        }
+
+        $ci->session->set_userdata('active_brand_id', (int) $brand->id);
+        return true;
+    }
+}
+
+
+if (!function_exists('log_brand_event')) {
+	/**
+	 * Record a brand-related action to the audit_logs table.
+	 *
+	 * Recommended $action values:
+	 *   brand_created, brand_updated, brand_deactivated, brand_reactivated,
+	 *   brand_user_assigned, brand_user_unassigned, superadmin_brand_switch
+	 *
+	 * @param  string     $action       Slug describing the action
+	 * @param  string     $entity_type  Table/entity name (e.g. 'brands', 'aauth_users')
+	 * @param  int|null   $entity_id    Primary key of the affected record
+	 * @param  array|null $old_values   Snapshot before change (will be JSON-encoded)
+	 * @param  array|null $new_values   Snapshot after change (will be JSON-encoded)
+	 * @param  int|null   $brand_id     The brand context. Defaults to get_active_brand_id().
+	 * @return bool
+	 */
+	function log_brand_event(
+		$action,
+		$entity_type,
+		$entity_id    = null,
+		$old_values   = null,
+		$new_values   = null,
+		$brand_id     = null
+	) {
+		$ci =& get_instance();
+		$ci->load->database();
+
+		$user_id = $ci->session->userdata('id');
+
+		if ($brand_id === null) {
+			$brand_id = get_active_brand_id();
+		}
+
+		$data = [
+			'user_id'     => $user_id    ? (int) $user_id    : null,
+			'brand_id'    => $brand_id   ? (int) $brand_id   : null,
+			'entity_type' => $entity_type,
+			'entity_id'   => $entity_id !== null ? (int) $entity_id : 0,
+			'action'      => $action,
+			'old_values'  => $old_values ? json_encode($old_values, JSON_UNESCAPED_UNICODE) : null,
+			'new_values'  => $new_values ? json_encode($new_values, JSON_UNESCAPED_UNICODE) : null,
+			'created_at'  => date('Y-m-d H:i:s'),
+		];
+
+		return (bool) $ci->db->insert('audit_logs', $data);
+	}
+}

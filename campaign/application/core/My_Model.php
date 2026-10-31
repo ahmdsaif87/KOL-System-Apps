@@ -8,6 +8,26 @@ class MY_Model extends CI_Model {
     private $table_name = 'table';
     private $field_search;
 
+    /**
+     * Multi-Brand Tenancy: Set to TRUE in any model whose table has a brand_id
+     * column and whose data must be isolated per brand. When TRUE, all base-class
+     * query helpers automatically inject WHERE brand_id = X.
+     *
+     * IMPORTANT: Never set this to TRUE on brand-global tables
+     * (e.g. kols, rands, kol_categories, auth_users).
+     *
+     * @var bool
+     */
+    protected $brand_scoped = FALSE;
+
+    /**
+     * The column used for brand scoping. Override only if your table uses a
+     * different alias (rare).
+     *
+     * @var string
+     */
+    protected $brand_scope_column = 'brand_id';
+
     public function __construct($config = array())
     {
         parent::__construct();
@@ -19,6 +39,64 @@ class MY_Model extends CI_Model {
         }
 
         $this->load->database();
+    }
+
+    // =========================================================================
+    // MULTI-BRAND SCOPE ENFORCEMENT
+    // =========================================================================
+
+    /**
+     * Applies brand_id WHERE clause to the active query builder chain when
+     * this model has $brand_scoped = TRUE.
+     *
+     * - For a scoped user (Staff/Leader): always constrains to their brand.
+     * - For Superadmin with a selected brand: constrains to that brand.
+     * - For Superadmin in "All Brands" view: no constraint (full access).
+     *
+     * Call this before any ->get() / ->get_where() / ->update() / ->delete()
+     * that should respect brand isolation.
+     *
+     * @param  string|null $table_alias Optional table alias prefix, e.g. 'c' for 'c.brand_id'
+     * @return $this  Fluent return for optional chaining
+     */
+    protected function apply_brand_scope($table_alias = null)
+    {
+        if (!$this->brand_scoped) {
+            return $this;
+        }
+
+        $brand_id = get_active_brand_id();
+
+        if ($brand_id !== null) {
+            $col = ($table_alias ? $table_alias . '.' : $this->table_name . '.') . $this->brand_scope_column;
+            $this->db->where($col, (int) $brand_id);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Guard for write operations (INSERT / UPDATE / DELETE) when Superadmin
+     * is in "All Brands" mode (active brand_id = null). Writing without a
+     * brand context is blocked to prevent accidental cross-brand data pollution.
+     *
+     * Throws a RuntimeException that surfaces as a 500 / can be caught by the
+     * calling controller for a friendly redirect/error message.
+     *
+     * @throws RuntimeException
+     */
+    protected function assert_brand_context_for_write()
+    {
+        if (!$this->brand_scoped) {
+            return; // Non-scoped models are always safe
+        }
+
+        if (get_active_brand_id() === null) {
+            throw new RuntimeException(
+                '[Multi-Brand] Write blocked: Superadmin must select a specific brand '
+                . 'before creating or modifying ' . get_class($this) . ' records.'
+            );
+        }
     }
 
     public function remove($id = NULL)
