@@ -14,6 +14,7 @@ Dokumentasi ini adalah panduan komprehensif, terstruktur, dan teknis yang disiap
 | **04** | [**04_CORE_BUSINESS_WORKFLOWS.md**](./04_CORE_BUSINESS_WORKFLOWS.md) | Finite State Machine (FSM) & pipeline bisnis: Rekrutmen KOL, Orkestrasi Kampanye, Auto-generate VT Tasks, Approval Brief/Draft, Logistik Resi, dan Finance Hub. |
 | **05** | [**05_EXTERNAL_INTEGRATIONS_AND_API.md**](./05_EXTERNAL_INTEGRATIONS_AND_API.md) | Integrasi mesin scraping Apify (TikTok/IG/YouTube), KeyAPI TikTok Shop, WhatsApp Notification Engine, dan REST API internal (`/articles/feed`). |
 | **06** | [**06_MIGRATION_ROADMAP_AND_DEVELOPER_GUIDE.md**](./06_MIGRATION_ROADMAP_AND_DEVELOPER_GUIDE.md) | Roadmap pengembangan 6 fase, panduan refactoring kode CI3 ke CI4 (Controllers, Requests, Views, Helpers), dan *checklist* verifikasi pra-rilis. |
+| **07** | [**MULTI-BRAND-ARCHITECTURE-PLAN.md**](./MULTI-BRAND-ARCHITECTURE-PLAN.md) | Spesifikasi lengkap & rencana implementasi arsitektur **Multi Brand (Satu Sistem, Banyak Brand)** pada CodeIgniter 3: isolasi tim per brand, Master Data Brands, registrasi KOL global, penghapusan ratecard file, proteksi privasi, dan transparansi portal KOL. |
 
 ---
 
