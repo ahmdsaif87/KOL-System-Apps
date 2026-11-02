@@ -545,10 +545,11 @@ class Admin extends MY_Controller
     */
     public function upload_file($data = [])
     {
+        $safe_allowed_types = 'pdf|jpg|jpeg|png|webp|doc|docx|xls|xlsx';
         $default = [
             'uuid'          => '', 
-            'allowed_types' => '*', 
-            'max_size'      => '', 
+            'allowed_types' => $safe_allowed_types, 
+            'max_size'      => '10240', 
             'max_width'     => '', 
             'max_height'    => '', 
             'upload_path'   => './uploads/tmp/',
@@ -562,13 +563,18 @@ class Admin extends MY_Controller
             }
         }
 
+        // Strict whitelist: never allow wildcard '*' or empty types
+        if (empty($default['allowed_types']) || $default['allowed_types'] === '*') {
+            $default['allowed_types'] = $safe_allowed_types;
+        }
+
         $dir = FCPATH . $default['upload_path'] . $default['uuid'];
         if (!is_dir($dir)) {
-            mkdir($dir);
+            mkdir($dir, 0777, true);
         }
 
         if (empty($default['file_name'])) {
-            $default['file_name'] = date('Y-m-d').$default['table_name'].date('His');
+            $default['file_name'] = date('Y-m-d').$default['table_name'].date('His').'_'.substr(md5(uniqid(mt_rand(), true)), 0, 8);
         }
 
         $config = [
@@ -592,6 +598,17 @@ class Admin extends MY_Controller
             return json_encode($result);
         } else {
             $upload_data = $this->upload->data();
+
+            // Strict double-check against dangerous script extensions
+            $dangerous_extensions = ['php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'phps', 'pht', 'phar', 'inc', 'cgi', 'pl', 'py', 'sh', 'bash', 'exe'];
+            $file_ext = strtolower(ltrim($upload_data['file_ext'], '.'));
+            if (in_array($file_ext, $dangerous_extensions)) {
+                @unlink($upload_data['full_path']);
+                return json_encode([
+                    'success' => false,
+                    'error'   => 'Tipe berkas tidak diizinkan demi keamanan.'
+                ]);
+            }
 
             $result = [
                 'uploadName'    => $upload_data['file_name'],

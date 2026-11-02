@@ -126,7 +126,7 @@
                         <div class="form-group ">
                             <label for="name" class="col-sm-2 control-label">Name <i class="required">*</i></label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" name="name" id="name" placeholder="Name" value="">
+                                <input type="text" class="form-control" name="name" id="name" placeholder="Name" value="" required>
                                 <small class="info help-block"><b>Input Name</b> Max Length : 150.</small>
                             </div>
                         </div>
@@ -134,7 +134,7 @@
                         <div class="form-group ">
                             <label for="phone" class="col-sm-2 control-label">Phone <i class="required">*</i></label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" value="">
+                                <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" value="" required>
                                 <small class="info help-block"><b>Input Phone</b> Max Length : 30.</small>
                             </div>
                         </div>
@@ -142,7 +142,7 @@
                         <div class="form-group ">
                             <label for="email" class="col-sm-2 control-label">Email <i class="required">*</i></label>
                             <div class="col-sm-8">
-                                <input type="email" class="form-control" name="email" id="email" placeholder="Email" value="">
+                                <input type="email" class="form-control" name="email" id="email" placeholder="Email" value="" required>
                                 <small class="info help-block"><b>Input Email</b> Max Length : 200.</small>
                             </div>
                         </div>
@@ -150,7 +150,7 @@
                         <div class="form-group ">
                             <label for="gender" class="col-sm-2 control-label">Gender <i class="required">*</i></label>
                             <div class="col-sm-8">
-                                <select class="form-control select2" name="gender" id="gender" data-placeholder="Select Gender">
+                                <select class="form-control select2" name="gender" id="gender" data-placeholder="Select Gender" required>
                                     <option value=""></option>
                                     <option value="MALE">Male</option>
                                     <option value="FEMALE">Female</option>
@@ -161,32 +161,22 @@
                         <div class="form-group ">
                             <label for="address" class="col-sm-2 control-label">Address <i class="required">*</i></label>
                             <div class="col-sm-8">
-                                <textarea id="address" name="address" rows="5" cols="80"></textarea>
+                                <textarea id="address" name="address" rows="5" cols="80" required></textarea>
                             </div>
                         </div>
                         
                         <div class="form-group ">
                             <label for="country" class="col-sm-2 control-label">Country <i class="required">*</i></label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" name="country" id="country" placeholder="Country" value="Indonesia">
+                                <input type="text" class="form-control" name="country" id="country" placeholder="Country" value="Indonesia" required>
                                 <small class="info help-block"><b>Input Country</b> Max Length : 50.</small>
-                            </div>
-                        </div>
-
-                        <div class="form-group ">
-                            <label for="rate_card_file" class="col-sm-2 control-label">Rate Card File <i class="required">*</i></label>
-                            <div class="col-sm-8">
-                                <div id="kols_rate_card_file_galery"></div>
-                                <input class="data_file" name="kols_rate_card_file_uuid" id="kols_rate_card_file_uuid" type="hidden" value="">
-                                <input class="data_file" name="kols_rate_card_file_name" id="kols_rate_card_file_name" type="hidden" value="">
-                                <small class="info help-block"><b>Input Rate Card File</b> Max Length : 500.</small>
                             </div>
                         </div>
                         
                         <div class="form-group ">
                             <label for="avatar_url" class="col-sm-2 control-label">Avatar URL <i class="required">*</i></label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" name="avatar_url" id="avatar_url" placeholder="Avatar URL" value="">
+                                <input type="text" class="form-control" name="avatar_url" id="avatar_url" placeholder="Avatar URL" value="" required>
                                 <small class="info help-block"><b>Input Avatar Url</b> Max Length : 2000.</small>
                             </div>
                         </div>
@@ -263,27 +253,27 @@
                                 <div class="form-group">
                                     <label for="phase2_username" class="col-sm-2 control-label">Username <i class="required text-danger">*</i></label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" name="username" id="phase2_username" placeholder="Username">
+                                        <input type="text" class="form-control" name="username" id="phase2_username" placeholder="Username" required>
                                         <small class="info help-block">A unique username for the portal.</small>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="phase2_email" class="col-sm-2 control-label">Login Email <i class="required text-danger">*</i></label>
                                     <div class="col-sm-8">
-                                        <input type="email" class="form-control" name="user_email" id="phase2_email" placeholder="Login Email">
+                                        <input type="email" class="form-control" name="user_email" id="phase2_email" placeholder="Login Email" required>
                                         <small class="info help-block">The email address used to log into the application.</small>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="phase2_password" class="col-sm-2 control-label">Password <i class="required text-danger">*</i></label>
                                     <div class="col-sm-8">
-                                        <input type="password" class="form-control" name="password" id="phase2_password" placeholder="Password (minimum 5 characters)">
+                                        <input type="password" class="form-control" name="password" id="phase2_password" placeholder="Password (minimum 5 characters)" required minlength="5">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="phase2_passconf" class="col-sm-2 control-label">Confirm Password <i class="required text-danger">*</i></label>
                                     <div class="col-sm-8">
-                                        <input type="password" class="form-control" name="passconf" id="phase2_passconf" placeholder="Repeat Password">
+                                        <input type="password" class="form-control" name="passconf" id="phase2_passconf" placeholder="Repeat Password" required minlength="5">
                                     </div>
                                 </div>
                                 
@@ -473,51 +463,5 @@
       var token = '<?= $this->security->get_csrf_hash(); ?>';
       params[csrf] = token;
 
-      $('#kols_rate_card_file_galery').fineUploader({
-          template: 'qq-template-gallery',
-          request: {
-              endpoint: BASE_URL + 'web/register/upload_rate_card_file',
-              params : params
-          },
-          deleteFile: {
-              enabled: true, 
-              endpoint: BASE_URL + 'web/register/delete_rate_card_file',
-          },
-          thumbnails: {
-              placeholders: {
-                  waitingPath: BASE_URL + '/asset/fine-upload/placeholders/waiting-generic.png',
-                  notAvailablePath: BASE_URL + '/asset/fine-upload/placeholders/not_available-generic.png'
-              }
-          },
-          multiple : false,
-          validation: {
-              allowedExtensions: ["*"],
-              sizeLimit : 0,
-          },
-          showMessage: function(msg) {
-              toastr['error'](msg);
-          },
-          callbacks: {
-              onComplete : function(id, name, xhr) {
-                if (xhr.success) {
-                   var uuid = $('#kols_rate_card_file_galery').fineUploader('getUuid', id);
-                   $('#kols_rate_card_file_uuid').val(uuid);
-                   $('#kols_rate_card_file_name').val(xhr.uploadName);
-                } else {
-                   toastr['error'](xhr.error);
-                }
-              },
-              onSubmit : function(id, name) {
-                  var uuid = $('#kols_rate_card_file_uuid').val();
-                  $.get(BASE_URL + 'web/register/delete_rate_card_file/' + uuid);
-              },
-              onDeleteComplete : function(id, xhr, isError) {
-                if (isError == false) {
-                  $('#kols_rate_card_file_uuid').val('');
-                  $('#kols_rate_card_file_name').val('');
-                }
-              }
-          }
-      });
     }); 
 </script>

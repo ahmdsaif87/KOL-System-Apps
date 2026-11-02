@@ -65,11 +65,11 @@
         'method'  => 'POST'
       ]); ?>
       <div class="form-group has-feedback <?= form_error('username') ? 'has-error' :''; ?>">
-        <input type="email" class="form-control" placeholder="Email" name="username" value="<?= set_value('username', 'admin@admin.com'); ?>">
+        <input type="email" class="form-control" placeholder="Email" name="username" value="<?= set_value('username'); ?>" autocomplete="username">
         <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback <?= form_error('password') ? 'has-error' :''; ?>">
-        <input type="password" class="form-control" placeholder="Password" name="password" value="admin123">
+        <input type="password" class="form-control" placeholder="Password" name="password" value="" autocomplete="current-password">
         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       </div>
       <div class="row">

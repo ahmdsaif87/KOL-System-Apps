@@ -19,6 +19,7 @@ class Not_found extends Front
 
 	public function index()
 	{
+		$this->output->set_status_header(404);
 		$this->cc_app->eventListen('show_error_404');
 		$this->template->build('error_404');
 	}

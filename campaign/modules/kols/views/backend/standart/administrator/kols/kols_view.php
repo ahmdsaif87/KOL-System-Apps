@@ -1,4 +1,24 @@
 
+<?php
+$can_view_sensitive = (function_exists('is_superadmin') && is_superadmin()) 
+    || (isset($this->aauth) && ($this->aauth->is_allowed('kols_view_bank_detail') || $this->aauth->is_admin()));
+
+$mask_phone = function($phone) {
+    if (empty($phone)) return '-';
+    $len = strlen($phone);
+    if ($len <= 5) return '***';
+    return substr($phone, 0, 4) . str_repeat('*', max(3, $len - 7)) . substr($phone, -3);
+};
+
+$mask_email = function($email) {
+    if (empty($email) || strpos($email, '@') === false) return '-';
+    $parts = explode('@', $email);
+    $name = $parts[0];
+    $domain = $parts[1];
+    $masked_name = strlen($name) > 2 ? substr($name, 0, 2) . '***' : $name . '***';
+    return $masked_name . '@' . $domain;
+};
+?>
 <script src="<?= BASE_ASSET; ?>/js/jquery.hotkeys.js"></script>
 <script type="text/javascript">
 function domo(){
@@ -403,11 +423,11 @@ dl.dl-horizontal dd { margin-left: 150px; color: #1e293b; font-weight: 500; marg
                   <div class="col-md-6">
                      <h4 class="section-title">Profile Information</h4>
                      <dl class="dl-horizontal">
-                        <dt>Phone</dt><dd><?= _ent($kols->phone) ?: '-'; ?></dd>
-                        <dt>Email</dt><dd><?= _ent($kols->email) ?: '-'; ?></dd>
+                        <dt>Phone</dt><dd><?= $can_view_sensitive ? (_ent($kols->phone) ?: '-') : $mask_phone($kols->phone); ?></dd>
+                        <dt>Email</dt><dd><?= $can_view_sensitive ? (_ent($kols->email) ?: '-') : $mask_email($kols->email); ?></dd>
                         <dt>Date of Birth</dt><dd><?= !empty($kols->date_of_birth) ? date('d M Y', strtotime($kols->date_of_birth)) : '-'; ?></dd>
                         <dt>Gender</dt><dd><?= _ent($kols->gender) ?: '-'; ?></dd>
-                        <dt>Address</dt><dd><?= _ent($kols->address) ?: '-'; ?></dd>
+                        <dt>Address</dt><dd><?= $can_view_sensitive ? (_ent($kols->address) ?: '-') : '<span class="text-muted"><i class="fa fa-lock"></i> Protected</span>'; ?></dd>
                         <dt>Category</dt>
                         <dd>
                            <?php if (!empty($kol_categories)): ?>
@@ -421,9 +441,9 @@ dl.dl-horizontal dd { margin-left: 150px; color: #1e293b; font-weight: 500; marg
                   <div class="col-md-6">
                      <h4 class="section-title">Commercial / Financial</h4>
                      <dl class="dl-horizontal">
-                        <dt>Bank Name</dt><dd><?= _ent($kols->bank_name) ?: '-'; ?></dd>
-                        <dt>Account Number</dt><dd><?= _ent($kols->bank_account_number) ?: '-'; ?></dd>
-                        <dt>Account Name</dt><dd><?= _ent($kols->bank_account_name) ?: '-'; ?></dd>
+                        <dt>Bank Name</dt><dd><?= $can_view_sensitive ? (_ent($kols->bank_name) ?: '-') : '<span class="text-muted"><i class="fa fa-lock"></i> Protected</span>'; ?></dd>
+                        <dt>Account Number</dt><dd><?= $can_view_sensitive ? (_ent($kols->bank_account_number) ?: '-') : '<span class="text-muted"><i class="fa fa-lock"></i> Protected</span>'; ?></dd>
+                        <dt>Account Name</dt><dd><?= $can_view_sensitive ? (_ent($kols->bank_account_name) ?: '-') : '<span class="text-muted"><i class="fa fa-lock"></i> Protected</span>'; ?></dd>
                         <dt>Approval Note</dt><dd><?= isset($kols->approval_note) ? _ent($kols->approval_note) : '-'; ?></dd>
                         <dt>Created By</dt><dd><?= _ent(!empty($kols->created_by_name) ? $kols->created_by_name : ($kols->created_by ?? '-')); ?></dd>
                         <dt>Approved By</dt><dd><?= isset($kols->approved_by_name) ? _ent($kols->approved_by_name) : (isset($kols->approved_by) ? _ent($kols->approved_by) : '-'); ?></dd>
@@ -664,22 +684,26 @@ dl.dl-horizontal dd { margin-left: 150px; color: #1e293b; font-weight: 500; marg
                      <?php endif; ?>
                   <?php endif; ?>
                   
-                  <?php if (!empty($kols->ktp_number)): ?>
-                     <div style="margin: 10px 0;"><strong>No. KTP:</strong> <?= _ent($kols->ktp_number); ?></div>
-                  <?php endif; ?>
-                  <?php if (!empty($kols->ktp_file)): ?>
-                     <a href="<?= BASE_URL . 'administrator/file/download/kols/' . $kols->ktp_file; ?>" class="doc-link">
-                        File KTP
-                     </a>
-                  <?php endif; ?>
-                  
-                  <?php if (!empty($kols->npwp_number)): ?>
-                     <div style="margin: 10px 0;"><strong>No. NPWP:</strong> <?= _ent($kols->npwp_number); ?></div>
-                  <?php endif; ?>
-                  <?php if (!empty($kols->npwp_file)): ?>
-                     <a href="<?= BASE_URL . 'administrator/file/download/kols/' . $kols->npwp_file; ?>" class="doc-link">
-                        File NPWP
-                     </a>
+                  <?php if ($can_view_sensitive): ?>
+                     <?php if (!empty($kols->ktp_number)): ?>
+                        <div style="margin: 10px 0;"><strong>No. KTP:</strong> <?= _ent($kols->ktp_number); ?></div>
+                     <?php endif; ?>
+                     <?php if (!empty($kols->ktp_file)): ?>
+                        <a href="<?= BASE_URL . 'administrator/file/download/kols/' . $kols->ktp_file; ?>" class="doc-link">
+                           File KTP
+                        </a>
+                     <?php endif; ?>
+                     
+                     <?php if (!empty($kols->npwp_number)): ?>
+                        <div style="margin: 10px 0;"><strong>No. NPWP:</strong> <?= _ent($kols->npwp_number); ?></div>
+                     <?php endif; ?>
+                     <?php if (!empty($kols->npwp_file)): ?>
+                        <a href="<?= BASE_URL . 'administrator/file/download/kols/' . $kols->npwp_file; ?>" class="doc-link">
+                           File NPWP
+                        </a>
+                     <?php endif; ?>
+                  <?php else: ?>
+                     <div style="margin: 10px 0;"><span class="text-muted"><i class="fa fa-lock"></i> Informasi KTP & NPWP disembunyikan untuk peran Anda.</span></div>
                   <?php endif; ?>
                </div>
 
