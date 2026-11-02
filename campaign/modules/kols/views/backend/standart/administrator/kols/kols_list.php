@@ -137,215 +137,245 @@ jQuery(document).ready(domo);
                 </div>
                     <form name="form_kols" id="form_kols" action="<?= base_url('administrator/kols/index'); ?>">
                    <?php
-                   $active_filter_count = 0;
-                   if (!empty($this->input->get('q'))) $active_filter_count++;
-                   if (!empty($this->input->get('category'))) $active_filter_count++;
-                   if (!empty($this->input->get('tier'))) $active_filter_count++;
-                   if (!empty($this->input->get('gender'))) $active_filter_count++;
-                   if (!empty($this->input->get('perf_platform'))) $active_filter_count++;
-                   if ($this->input->get('perf_min_views') !== null && $this->input->get('perf_min_views') !== '') $active_filter_count++;
-                   if ($this->input->get('perf_min_er') !== null && $this->input->get('perf_min_er') !== '') $active_filter_count++;
-                   if ($this->input->get('perf_min_gmv') !== null && $this->input->get('perf_min_gmv') !== '') $active_filter_count++;
-                   if (!empty($this->input->get('perf_status'))) $active_filter_count++;
+                   $quick_filter_count = 0;
+                   if (!empty($this->input->get('q'))) $quick_filter_count++;
+                   if (!empty($this->input->get('category'))) $quick_filter_count++;
+                   if (!empty($this->input->get('tier'))) $quick_filter_count++;
+                   if (!empty($this->input->get('perf_sort'))) $quick_filter_count++;
 
-                   $has_active_filters = ($active_filter_count > 0);
+                   $advanced_filter_count = 0;
+                   if (!empty($this->input->get('gender'))) $advanced_filter_count++;
+                   if (!empty($this->input->get('perf_platform'))) $advanced_filter_count++;
+                   if ($this->input->get('perf_min_views') !== null && $this->input->get('perf_min_views') !== '') $advanced_filter_count++;
+                   if ($this->input->get('perf_min_er') !== null && $this->input->get('perf_min_er') !== '') $advanced_filter_count++;
+                   if ($this->input->get('perf_min_gmv') !== null && $this->input->get('perf_min_gmv') !== '') $advanced_filter_count++;
+                   if (!empty($this->input->get('perf_status'))) $advanced_filter_count++;
+
+                   $total_active_filters = $quick_filter_count + $advanced_filter_count;
+                   $has_advanced_filters = ($advanced_filter_count > 0);
+                   $has_active_filters   = ($total_active_filters > 0);
                    ?>
-                   <!-- Filter Toolbar Card (Performance Card Metrics) -->
-                   <div class="filter-toolbar-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); overflow: hidden;">
+                   <style>
+                      .kols-filter-toolbar .kols-filter-field,
+                      .kols-filter-toolbar .kols-btn-action {
+                         height: 34px !important;
+                         min-height: 34px !important;
+                         max-height: 34px !important;
+                         padding: 6px 10px !important;
+                         font-size: 12px !important;
+                         line-height: 20px !important;
+                         border-radius: 4px !important;
+                         border: 1px solid #cbd5e1 !important;
+                         box-sizing: border-box !important;
+                         vertical-align: middle !important;
+                      }
+                      .kols-filter-toolbar select.kols-filter-field {
+                         padding: 5px 8px !important;
+                         background-color: #ffffff !important;
+                         cursor: pointer;
+                      }
+                      .kols-filter-toolbar .kols-filter-label {
+                         font-size: 11px !important;
+                         text-transform: uppercase !important;
+                         color: #64748b !important;
+                         font-weight: 600 !important;
+                         height: 16px !important;
+                         line-height: 16px !important;
+                         margin-bottom: 5px !important;
+                         display: flex !important;
+                         align-items: center !important;
+                         gap: 5px !important;
+                         white-space: nowrap !important;
+                         overflow: hidden !important;
+                      }
+                      .kols-filter-toolbar .kols-btn-action {
+                         display: inline-flex !important;
+                         align-items: center !important;
+                         justify-content: center !important;
+                         font-weight: 600 !important;
+                         gap: 4px !important;
+                      }
+                   </style>
+                   <!-- Filter Toolbar Card (Streamlined Quick & Advanced Filters) -->
+                   <div class="filter-toolbar-card kols-filter-toolbar" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
                       
-                      <!-- Header Bar (Clickable Toggle) -->
-                      <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: #f8fafc; cursor: pointer; user-select: none;" data-toggle="collapse" data-target="#filterToolbarCollapse" aria-expanded="false">
-                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <i class="fa fa-sliders text-primary" style="font-size: 14px;"></i>
-                            <span style="font-size: 13px; font-weight: 600; color: #334155;">Filter & Pencarian KOL</span>
-                            <?php if ($has_active_filters): ?>
-                                <span class="badge" style="background: #3b82f6; color: #ffffff; font-size: 11px; padding: 3px 8px; border-radius: 10px; font-weight: 600;">
-                                   <?= $active_filter_count; ?> Filter Aktif
-                                </span>
-                            <?php endif; ?>
-                         </div>
-                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <?php if ($has_active_filters): ?>
-                               <a href="<?= base_url('administrator/kols');?>" class="btn btn-default btn-xs" onclick="event.stopPropagation();" style="border-radius: 4px; padding: 3px 8px; color: #ef4444; border-color: #fecaca; background: #fef2f2; font-size: 11px; font-weight: 500;">
-                                  <i class="fa fa-undo"></i> Reset
-                               </a>
-                            <?php endif; ?>
-                            <button type="button" class="btn btn-default btn-xs" style="border-radius: 4px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: #64748b; background: #ffffff;">
-                               <span id="filterToggleText">Buka Filter</span>
-                               <i class="fa fa-chevron-down" id="filterChevron" style="margin-left: 4px;"></i>
-                            </button>
-                         </div>
-                      </div>
-
-                      <!-- Collapsible Body (Only expands when clicked by user) -->
-                      <div class="collapse" id="filterToolbarCollapse">
-                         <div style="padding: 14px 16px 8px; background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                      <!-- Quick Search & Primary Filters (Always Visible) -->
+                      <div style="padding: 12px 16px; background: #ffffff; border-radius: 8px 8px 0 0;">
+                         <div class="row" style="margin-left: -5px; margin-right: -5px;">
                             
-                            <!-- Row 1: Profile & Demographics -->
-                            <div class="row" style="margin-left: -6px; margin-right: -6px; margin-bottom: 10px;">
-                         
-                         <!-- Keyword Search Input -->
-                         <div class="col-md-3 col-sm-6" style="padding: 0 6px; margin-bottom: 8px;">
-                            <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
-                               <i class="fa fa-search"></i> Kata Kunci
-                            </label>
-                            <input type="text" class="form-control input-sm" name="q" id="filter" placeholder="Cari nama, email, phone..." value="<?= _ent($this->input->get('q')); ?>" style="border-radius: 4px; height: 32px;">
-                         </div>
+                            <!-- 1. Kata Kunci Search -->
+                            <div class="col-md-4 col-sm-6 col-xs-12" style="padding: 0 5px; margin-bottom: 6px;">
+                               <label class="kols-filter-label">
+                                  <i class="fa fa-search"></i> Kata Kunci
+                               </label>
+                               <input type="text" class="form-control kols-filter-field" name="q" id="filter" placeholder="Cari nama, email, phone, IG, TikTok..." value="<?= _ent($this->input->get('q')); ?>">
+                            </div>
 
-                         <!-- Category Filter -->
-                         <div class="col-md-3 col-sm-6" style="padding: 0 6px; margin-bottom: 8px;">
-                            <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
-                               <i class="fa fa-tags" style="color: #8b5cf6;"></i> Kategori
-                            </label>
-                            <select class="form-control input-sm" name="category" id="category" style="border-radius: 4px; height: 32px;">
-                               <option value="">Semua Kategori</option>
-                               <?php if (!empty($all_categories)): ?>
-                                  <?php foreach ($all_categories as $c): ?>
-                                     <option value="<?= $c->id; ?>" <?= $this->input->get('category') == $c->id ? 'selected' : ''; ?>>
-                                        <?= _ent($c->name); ?>
-                                     </option>
-                                  <?php endforeach; ?>
-                               <?php endif; ?>
-                            </select>
-                         </div>
+                            <!-- 2. Kategori -->
+                            <div class="col-md-2 col-sm-6 col-xs-6" style="padding: 0 5px; margin-bottom: 6px;">
+                               <label class="kols-filter-label">
+                                  <i class="fa fa-tags" style="color: #8b5cf6;"></i> Kategori
+                               </label>
+                               <select class="form-control kols-filter-field" name="category" id="category">
+                                  <option value="">Semua Kategori</option>
+                                  <?php if (!empty($all_categories)): ?>
+                                     <?php foreach ($all_categories as $c): ?>
+                                        <option value="<?= $c->id; ?>" <?= $this->input->get('category') == $c->id ? 'selected' : ''; ?>>
+                                           <?= _ent($c->name); ?>
+                                        </option>
+                                     <?php endforeach; ?>
+                                  <?php endif; ?>
+                               </select>
+                            </div>
 
-                         <!-- Tier Filter -->
-                         <div class="col-md-2 col-sm-6" style="padding: 0 6px; margin-bottom: 8px;">
-                            <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
-                               <i class="fa fa-star text-warning"></i> Tier
-                            </label>
-                            <select class="form-control input-sm" name="tier" id="tier" style="border-radius: 4px; height: 32px;">
-                               <option value="">Semua Tier</option>
-                               <?php if (!empty($all_tiers)): ?>
-                                  <?php foreach ($all_tiers as $t): ?>
-                                     <option value="<?= $t->id; ?>" <?= $this->input->get('tier') == $t->id ? 'selected' : ''; ?>>
-                                        <?= _ent($t->name); ?>
-                                     </option>
-                                  <?php endforeach; ?>
-                               <?php endif; ?>
-                            </select>
-                         </div>
+                            <!-- 3. Tier -->
+                            <div class="col-md-2 col-sm-6 col-xs-6" style="padding: 0 5px; margin-bottom: 6px;">
+                               <label class="kols-filter-label">
+                                  <i class="fa fa-star text-warning"></i> Tier
+                               </label>
+                               <select class="form-control kols-filter-field" name="tier" id="tier">
+                                  <option value="">Semua Tier</option>
+                                  <?php if (!empty($all_tiers)): ?>
+                                     <?php foreach ($all_tiers as $t): ?>
+                                        <option value="<?= $t->id; ?>" <?= $this->input->get('tier') == $t->id ? 'selected' : ''; ?>>
+                                           <?= _ent($t->name); ?>
+                                        </option>
+                                     <?php endforeach; ?>
+                                  <?php endif; ?>
+                               </select>
+                            </div>
 
-                         <!-- Gender Filter -->
-                         <div class="col-md-2 col-sm-6" style="padding: 0 6px; margin-bottom: 8px;">
-                            <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
-                               <i class="fa fa-venus-mars text-info"></i> Gender
-                            </label>
-                            <select class="form-control input-sm" name="gender" id="gender" style="border-radius: 4px; height: 32px;">
-                               <option value="">Semua Gender</option>
-                               <option value="MALE" <?= strtoupper($this->input->get('gender') ?? '') === 'MALE' ? 'selected' : ''; ?>>Laki-laki</option>
-                               <option value="FEMALE" <?= strtoupper($this->input->get('gender') ?? '') === 'FEMALE' ? 'selected' : ''; ?>>Perempuan</option>
-                            </select>
-                         </div>
+                            <!-- 4. Urutkan (Sort) -->
+                            <div class="col-md-2 col-sm-6 col-xs-6" style="padding: 0 5px; margin-bottom: 6px;">
+                               <label class="kols-filter-label">
+                                  <i class="fa fa-sort-amount-desc"></i> Urutkan
+                               </label>
+                               <select class="form-control kols-filter-field" name="perf_sort" id="perf_sort">
+                                  <option value="">Terkini (Default)</option>
+                                  <option <?= $this->input->get('perf_sort') == 'gmv_desc' ? 'selected' : ''; ?> value="gmv_desc">GMV Tertinggi</option>
+                                  <option <?= $this->input->get('perf_sort') == 'gmv_asc' ? 'selected' : ''; ?> value="gmv_asc">GMV Terendah</option>
+                                  <option <?= $this->input->get('perf_sort') == 'views_desc' ? 'selected' : ''; ?> value="views_desc">Avg Views Tertinggi</option>
+                                  <option <?= $this->input->get('perf_sort') == 'views_asc' ? 'selected' : ''; ?> value="views_asc">Avg Views Terendah</option>
+                                  <option <?= $this->input->get('perf_sort') == 'er_desc' ? 'selected' : ''; ?> value="er_desc">Avg ER Tertinggi</option>
+                                  <option <?= $this->input->get('perf_sort') == 'er_asc' ? 'selected' : ''; ?> value="er_asc">Avg ER Terendah</option>
+                                  <option <?= $this->input->get('perf_sort') == 'followers_desc' ? 'selected' : ''; ?> value="followers_desc">Followers Terbanyak</option>
+                                  <option <?= $this->input->get('perf_sort') == 'name_asc' ? 'selected' : ''; ?> value="name_asc">Nama (A - Z)</option>
+                                  <option <?= $this->input->get('perf_sort') == 'rate_min_asc' ? 'selected' : ''; ?> value="rate_min_asc">Rate Termurah</option>
+                                  <option <?= $this->input->get('perf_sort') == 'rate_min_desc' ? 'selected' : ''; ?> value="rate_min_desc">Rate Termahal</option>
+                                   <optgroup label="Rate Card (per tipe)">
+                                      <option <?= $this->input->get('perf_sort') == 'price_vt_asc' ? 'selected' : ''; ?> value="price_vt_asc">Short Form (Termurah)</option>
+                                      <option <?= $this->input->get('perf_sort') == 'price_vt_desc' ? 'selected' : ''; ?> value="price_vt_desc">Short Form (Termahal)</option>
+                                      <option <?= $this->input->get('perf_sort') == 'price_live_asc' ? 'selected' : ''; ?> value="price_live_asc">Live Streaming (Termurah)</option>
+                                      <option <?= $this->input->get('perf_sort') == 'price_live_desc' ? 'selected' : ''; ?> value="price_live_desc">Live Streaming (Termahal)</option>
+                                      <option <?= $this->input->get('perf_sort') == 'price_long_form_asc' ? 'selected' : ''; ?> value="price_long_form_asc">Long Form (Termurah)</option>
+                                      <option <?= $this->input->get('perf_sort') == 'price_long_form_desc' ? 'selected' : ''; ?> value="price_long_form_desc">Long Form (Termahal)</option>
+                                   </optgroup>
+                               </select>
+                            </div>
 
-                         <!-- Platform Filter -->
-                         <div class="col-md-2 col-sm-6" style="padding: 0 6px; margin-bottom: 8px;">
-                            <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
-                               <i class="fa fa-globe text-primary"></i> Platform
-                            </label>
-                            <select class="form-control input-sm" name="perf_platform" id="perf_platform" style="border-radius: 4px; height: 32px;">
-                               <option value="">Semua Platform</option>
-                               <?php if (!empty($all_platforms)): ?>
-                                  <?php foreach ($all_platforms as $p): ?>
-                                     <option value="<?= $p->id; ?>" <?= $this->input->get('perf_platform') == $p->id ? 'selected' : ''; ?>>
-                                        <?= _ent($p->name); ?>
-                                     </option>
-                                  <?php endforeach; ?>
-                               <?php endif; ?>
-                            </select>
-                         </div>
+                            <!-- 5. Actions (Cari, Filter Lanjutan, Reset) -->
+                            <div class="col-md-2 col-sm-6 col-xs-6" style="padding: 0 5px; margin-bottom: 6px;">
+                               <label class="kols-filter-label" style="color: transparent;">&nbsp;</label>
+                               <div style="display: flex; gap: 4px;">
+                                  <button type="submit" class="btn btn-primary btn-sm btn-flat kols-btn-action" style="flex: 1;">
+                                     <i class="fa fa-filter"></i> Filter
+                                  </button>
+                                  <button type="button" class="btn <?= $has_advanced_filters ? 'btn-info' : 'btn-default' ?> btn-sm btn-flat kols-btn-action" data-toggle="collapse" data-target="#advancedFilterCollapse" style="padding: 6px 10px;">
+                                     <i class="fa fa-sliders"></i>
+                                     <?php if ($advanced_filter_count > 0): ?>
+                                        <span class="badge" style="background: #ffffff; color: #0284c7; font-size: 10px; padding: 2px 4px; font-weight: 700;"><?= $advanced_filter_count; ?></span>
+                                     <?php endif; ?>
+                                  </button>
+                                  <?php if ($has_active_filters): ?>
+                                     <a href="<?= base_url('administrator/kols');?>" class="btn btn-default btn-sm btn-flat kols-btn-action" title="Reset Filter" style="padding: 6px 10px; color: #ef4444; border-color: #fecaca; background: #fef2f2;">
+                                        <i class="fa fa-undo"></i>
+                                     </a>
+                                  <?php endif; ?>
+                                </div>
+                            </div>
 
+                         </div>
                       </div>
 
-                      <!-- Row 2: Performance, Status, Sort & Actions -->
-                      <div class="row" style="margin-left: -6px; margin-right: -6px;">
+                      <!-- Collapsible Advanced Filters Section -->
+                      <div class="collapse <?= $has_advanced_filters ? 'in' : '' ?>" id="advancedFilterCollapse">
+                         <div style="padding: 12px 16px 8px; background: #f8fafc; border-top: 1px solid #e2e8f0; border-radius: 0 0 8px 8px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                               <span style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.3px;">
+                                  <i class="fa fa-sliders text-info"></i> Parameter Filter Lanjutan
+                               </span>
+                               <span style="font-size: 11px; color: #94a3b8;">Metrik performa scraper &amp; demografi</span>
+                            </div>
 
-                         <!-- Min Avg Views (Performance Card) -->
-                          <div class="col-md-2 col-sm-6" style="padding: 0 6px; margin-bottom: 8px;">
-                             <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
-                                <i class="fa fa-eye text-info"></i> Min Views (30D)
-                             </label>
-                             <input type="number" step="1000" min="0" class="form-control input-sm" name="perf_min_views" id="perf_min_views" placeholder="Contoh: 50000" value="<?= _ent($this->input->get('perf_min_views')); ?>" style="border-radius: 4px; height: 32px;">
-                          </div>
+                            <div class="row" style="margin-left: -5px; margin-right: -5px;">
+                               <!-- Gender -->
+                               <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
+                                  <label class="kols-filter-label">
+                                     <i class="fa fa-venus-mars text-info"></i> Gender
+                                  </label>
+                                  <select class="form-control kols-filter-field" name="gender" id="gender">
+                                     <option value="">Semua Gender</option>
+                                     <option value="MALE" <?= strtoupper($this->input->get('gender') ?? '') === 'MALE' ? 'selected' : ''; ?>>Laki-laki</option>
+                                     <option value="FEMALE" <?= strtoupper($this->input->get('gender') ?? '') === 'FEMALE' ? 'selected' : ''; ?>>Perempuan</option>
+                                  </select>
+                               </div>
 
-                          <!-- Min Avg ER % (Performance Card) -->
-                          <div class="col-md-2 col-sm-6" style="padding: 0 6px; margin-bottom: 8px;">
-                             <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
-                                <i class="fa fa-line-chart text-success"></i> Min Avg ER (%)
-                             </label>
-                             <input type="number" step="0.1" min="0" max="100" class="form-control input-sm" name="perf_min_er" id="perf_min_er" placeholder="Contoh: 5 (%)" value="<?= _ent($this->input->get('perf_min_er')); ?>" style="border-radius: 4px; height: 32px;">
-                          </div>
+                               <!-- Platform -->
+                               <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
+                                  <label class="kols-filter-label">
+                                     <i class="fa fa-globe text-primary"></i> Platform
+                                  </label>
+                                  <select class="form-control kols-filter-field" name="perf_platform" id="perf_platform">
+                                     <option value="">Semua Platform</option>
+                                     <?php if (!empty($all_platforms)): ?>
+                                        <?php foreach ($all_platforms as $p): ?>
+                                           <option value="<?= $p->id; ?>" <?= $this->input->get('perf_platform') == $p->id ? 'selected' : ''; ?>>
+                                              <?= _ent($p->name); ?>
+                                           </option>
+                                        <?php endforeach; ?>
+                                     <?php endif; ?>
+                                  </select>
+                               </div>
 
-                          <!-- Min GMV (Rp) -->
-                          <div class="col-md-2 col-sm-6" style="padding: 0 6px; margin-bottom: 8px;">
-                             <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
-                                <i class="fa fa-shopping-bag text-success"></i> Min GMV (Rp)
-                             </label>
-                             <input type="number" step="1000000" min="0" class="form-control input-sm" name="perf_min_gmv" id="perf_min_gmv" placeholder="Contoh: 10000000" value="<?= _ent($this->input->get('perf_min_gmv')); ?>" style="border-radius: 4px; height: 32px;">
-                          </div>
+                               <!-- Status Data -->
+                               <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
+                                  <label class="kols-filter-label">
+                                     <i class="fa fa-database"></i> Status Data
+                                  </label>
+                                  <select class="form-control kols-filter-field" name="perf_status" id="perf_status">
+                                     <option value="">Semua Data</option>
+                                     <option value="synced" <?= $this->input->get('perf_status') == 'synced' ? 'selected' : ''; ?>>Ada Data Scrape</option>
+                                     <option value="has_gmv" <?= $this->input->get('perf_status') == 'has_gmv' ? 'selected' : ''; ?>>Ada GMV TikTok</option>
+                                     <option value="unsynced" <?= $this->input->get('perf_status') == 'unsynced' ? 'selected' : ''; ?>>Belum Scrape</option>
+                                  </select>
+                               </div>
 
-                          <!-- Data Status (Synced vs Unsynced vs Has GMV) -->
-                          <div class="col-md-2 col-sm-6" style="padding: 0 6px; margin-bottom: 8px;">
-                             <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
-                                <i class="fa fa-database"></i> Status Data
-                             </label>
-                             <select class="form-control input-sm" name="perf_status" id="perf_status" style="border-radius: 4px; height: 32px;">
-                                <option value="">Semua Data</option>
-                                <option value="synced" <?= $this->input->get('perf_status') == 'synced' ? 'selected' : ''; ?>>Ada Data Scrape</option>
-                                <option value="has_gmv" <?= $this->input->get('perf_status') == 'has_gmv' ? 'selected' : ''; ?>>Ada GMV TikTok</option>
-                                <option value="unsynced" <?= $this->input->get('perf_status') == 'unsynced' ? 'selected' : ''; ?>>Belum Scrape</option>
-                             </select>
-                          </div>
+                               <!-- Min Avg Views -->
+                               <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
+                                  <label class="kols-filter-label">
+                                     <i class="fa fa-eye text-info"></i> Min Views (30D)
+                                  </label>
+                                  <input type="number" step="1000" min="0" class="form-control kols-filter-field" name="perf_min_views" id="perf_min_views" placeholder="Contoh: 50000" value="<?= _ent($this->input->get('perf_min_views')); ?>">
+                                </div>
 
-                          <!-- Sort By Performance -->
-                          <div class="col-md-2 col-sm-6" style="padding: 0 6px; margin-bottom: 8px;">
-                             <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
-                                <i class="fa fa-sort-amount-desc"></i> Urutkan
-                             </label>
-                             <select class="form-control input-sm" name="perf_sort" id="perf_sort" style="border-radius: 4px; height: 32px;">
-                                <option value="">Terkini (Default)</option>
-                                <option <?= $this->input->get('perf_sort') == 'gmv_desc' ? 'selected' : ''; ?> value="gmv_desc">GMV Tertinggi</option>
-                                <option <?= $this->input->get('perf_sort') == 'gmv_asc' ? 'selected' : ''; ?> value="gmv_asc">GMV Terendah</option>
-                                <option <?= $this->input->get('perf_sort') == 'views_desc' ? 'selected' : ''; ?> value="views_desc">Avg Views Tertinggi</option>
-                                <option <?= $this->input->get('perf_sort') == 'views_asc' ? 'selected' : ''; ?> value="views_asc">Avg Views Terendah</option>
-                                <option <?= $this->input->get('perf_sort') == 'er_desc' ? 'selected' : ''; ?> value="er_desc">Avg ER Tertinggi</option>
-                                <option <?= $this->input->get('perf_sort') == 'er_asc' ? 'selected' : ''; ?> value="er_asc">Avg ER Terendah</option>
-                                <option <?= $this->input->get('perf_sort') == 'followers_desc' ? 'selected' : ''; ?> value="followers_desc">Followers Terbanyak</option>
-                                <option <?= $this->input->get('perf_sort') == 'name_asc' ? 'selected' : ''; ?> value="name_asc">Nama (A - Z)</option>
-                                <option <?= $this->input->get('perf_sort') == 'rate_min_asc' ? 'selected' : ''; ?> value="rate_min_asc">Rate Termurah (Semua Layanan)</option>
-                                <option <?= $this->input->get('perf_sort') == 'rate_min_desc' ? 'selected' : ''; ?> value="rate_min_desc">Rate Termahal (Semua Layanan)</option>
-                                 <optgroup label="Rate Card (per tipe)">
-                                    <option <?= $this->input->get('perf_sort') == 'price_vt_asc' ? 'selected' : ''; ?> value="price_vt_asc">Short Form (Termurah)</option>
-                                    <option <?= $this->input->get('perf_sort') == 'price_vt_desc' ? 'selected' : ''; ?> value="price_vt_desc">Short Form (Termahal)</option>
-                                    <option <?= $this->input->get('perf_sort') == 'price_live_asc' ? 'selected' : ''; ?> value="price_live_asc">Live Streaming (Termurah)</option>
-                                    <option <?= $this->input->get('perf_sort') == 'price_live_desc' ? 'selected' : ''; ?> value="price_live_desc">Live Streaming (Termahal)</option>
-                                    <option <?= $this->input->get('perf_sort') == 'price_long_form_asc' ? 'selected' : ''; ?> value="price_long_form_asc">Long Form (Termurah)</option>
-                                    <option <?= $this->input->get('perf_sort') == 'price_long_form_desc' ? 'selected' : ''; ?> value="price_long_form_desc">Long Form (Termahal)</option>
-                                 </optgroup>
-                             </select>
-                          </div>
+                               <!-- Min Avg ER % -->
+                               <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
+                                  <label class="kols-filter-label">
+                                     <i class="fa fa-line-chart text-success"></i> Min Avg ER (%)
+                                  </label>
+                                  <input type="number" step="0.1" min="0" max="100" class="form-control kols-filter-field" name="perf_min_er" id="perf_min_er" placeholder="Contoh: 5 (%)" value="<?= _ent($this->input->get('perf_min_er')); ?>">
+                               </div>
 
-                         
-
-                         <!-- Action Buttons -->
-                         <div class="col-md-2 col-sm-6" style="padding: 0 6px; margin-bottom: 8px;">
-                            <label style="font-size: 11px; text-transform: uppercase; color: transparent; font-weight: 600; margin-bottom: 4px; display: block;">
-                               &nbsp;
-                            </label>
-                            <div style="display: flex; gap: 6px;">
-                               <button type="submit" class="btn btn-primary btn-sm btn-flat" name="sbtn" id="sbtn" value="Apply" title="<?= cclang('filter_search'); ?>" style="border-radius: 4px; height: 32px; flex: 1; font-weight: 600;">
-                                  <i class="fa fa-filter"></i> Filter
-                               </button>
-                               <a class="btn btn-default btn-sm btn-flat" name="reset" id="reset" href="<?= base_url('administrator/kols');?>" title="<?= cclang('reset_filter'); ?>" style="border-radius: 4px; height: 32px; padding: 6px 12px; color: #64748b;">
-                                  <i class="fa fa-undo"></i> Reset
-                                </a>
+                               <!-- Min GMV (Rp) -->
+                               <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
+                                  <label class="kols-filter-label">
+                                     <i class="fa fa-shopping-bag text-success"></i> Min GMV (Rp)
+                                  </label>
+                                  <input type="number" step="1000000" min="0" class="form-control kols-filter-field" name="perf_min_gmv" id="perf_min_gmv" placeholder="Contoh: 10000000" value="<?= _ent($this->input->get('perf_min_gmv')); ?>">
+                               </div>
                             </div>
                          </div>
-
-                      </div>
-
-                   </div>
-                </div><!-- /#filterToolbarCollapse -->
+                      </div>                   </div>
 
                 <!-- Active Filter Pills (if any filter is applied) -->
                 <?php if ($has_active_filters): ?>

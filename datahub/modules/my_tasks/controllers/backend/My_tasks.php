@@ -46,6 +46,8 @@ class My_tasks extends Admin
 			campaign_kols.status as ck_status,
 			campaign_kols.deal_amount,
 			campaigns.name as campaign_title, 
+			brands.name as brand_name,
+			brands.logo as brand_logo,
 			campaigns.status as campaign_status, 
 			variants.name as variants_name, 
 			platforms.name as platforms_name, 
@@ -58,6 +60,7 @@ class My_tasks extends Admin
 			->from('tasks')
 			->join('campaign_kols', 'campaign_kols.id = tasks.campaign_kol_id', 'INNER')
 			->join('campaigns', 'campaigns.id = campaign_kols.campaign_id', 'LEFT')
+			->join('brands', 'brands.id = campaigns.brand_id', 'LEFT')
 			->join('variants', 'variants.id = tasks.variant_id', 'LEFT')
 			->join('platforms', 'platforms.id = tasks.platform_id', 'LEFT')
 			->join('briefs', 'briefs.task_id = tasks.id', 'LEFT')

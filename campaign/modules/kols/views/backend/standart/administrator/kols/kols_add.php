@@ -221,18 +221,7 @@
                         </div>
                                                  
 
-                                                <div class="form-group ">
-                            <label for="rate_card_file" class="col-sm-2 control-label">Rate Card File 
-                            <i class="required">*</i>
-                            </label>
-                            <div class="col-sm-8">
-                                <div id="kols_rate_card_file_galery"></div>
-                                <input class="data_file" name="kols_rate_card_file_uuid" id="kols_rate_card_file_uuid" type="hidden" value="<?= set_value('kols_rate_card_file_uuid'); ?>">
-                                <input class="data_file" name="kols_rate_card_file_name" id="kols_rate_card_file_name" type="hidden" value="<?= set_value('kols_rate_card_file_name'); ?>">
-                                <small class="info help-block">
-                                <b>Input Rate Card File</b> Max Length : 500.</small>
-                            </div>
-                        </div>
+
                                                  
                                                 <div class="form-group ">
                             <label for="avatar_url" class="col-sm-2 control-label">Avatar URL 
@@ -607,53 +596,6 @@
       
               var params = {};
        params[csrf] = token;
-
-       $('#kols_rate_card_file_galery').fineUploader({
-          template: 'qq-template-gallery',
-          request: {
-              endpoint: BASE_URL + '/administrator/kols/upload_rate_card_file_file',
-              params : params
-          },
-          deleteFile: {
-              enabled: true, 
-              endpoint: BASE_URL + '/administrator/kols/delete_rate_card_file_file',
-          },
-          thumbnails: {
-              placeholders: {
-                  waitingPath: BASE_URL + '/asset/fine-upload/placeholders/waiting-generic.png',
-                  notAvailablePath: BASE_URL + '/asset/fine-upload/placeholders/not_available-generic.png'
-              }
-          },
-          multiple : false,
-          validation: {
-              allowedExtensions: ["*"],
-              sizeLimit : 0,
-                        },
-          showMessage: function(msg) {
-              toastr['error'](msg);
-          },
-          callbacks: {
-              onComplete : function(id, name, xhr) {
-                if (xhr.success) {
-                   var uuid = $('#kols_rate_card_file_galery').fineUploader('getUuid', id);
-                   $('#kols_rate_card_file_uuid').val(uuid);
-                   $('#kols_rate_card_file_name').val(xhr.uploadName);
-                } else {
-                   toastr['error'](xhr.error);
-                }
-              },
-              onSubmit : function(id, name) {
-                  var uuid = $('#kols_rate_card_file_uuid').val();
-                  $.get(BASE_URL + '/administrator/kols/delete_rate_card_file_file/' + uuid);
-              },
-              onDeleteComplete : function(id, xhr, isError) {
-                if (isError == false) {
-                  $('#kols_rate_card_file_uuid').val('');
-                  $('#kols_rate_card_file_name').val('');
-                }
-              }
-          }
-      }); /*end rate_card_file galery*/
               
       $('#kols_npwp_file_galery').fineUploader({
           template: 'qq-template-gallery',

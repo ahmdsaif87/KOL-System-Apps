@@ -172,7 +172,13 @@
                                 <small class="info help-block"><b>Input Country</b> Max Length : 50.</small>
                             </div>
                         </div>
-                        
+                        <div class="form-group ">
+                            <label for="price_vt" class="col-sm-2 control-label">Rate Card (Short Form) </label>
+                            <div class="col-sm-8">
+                                <input type="number" class="form-control" name="price_vt" id="price_vt" placeholder="Estimasi Rate Card / Short Form Video (Rp)" value="<?= set_value('price_vt'); ?>">
+                                <small class="info help-block">Estimasi tarif rate card numerik untuk short form video (opsional).</small>
+                            </div>
+                        </div>
                         <div class="form-group ">
                             <label for="avatar_url" class="col-sm-2 control-label">Avatar URL <i class="required">*</i></label>
                             <div class="col-sm-8">
@@ -457,11 +463,6 @@
           $('.loading_user').hide();
         });
       });
-      
-      var params = {};
-      var csrf = '<?= $this->security->get_csrf_token_name(); ?>';
-      var token = '<?= $this->security->get_csrf_hash(); ?>';
-      params[csrf] = token;
 
     }); 
 </script>

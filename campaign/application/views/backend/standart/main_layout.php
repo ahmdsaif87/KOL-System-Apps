@@ -166,6 +166,101 @@
       <?php if ($this->aauth->get_user()): ?>
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
+          <!-- Multi-Brand Tenancy Navigation Component (Milestone 3) -->
+          <?php if (function_exists('is_superadmin') && is_superadmin()): ?>
+            <?php
+              $ci =& get_instance();
+              $active_brand_id = function_exists('get_active_brand_id') ? get_active_brand_id() : null;
+              $active_brand = function_exists('get_active_brand') ? get_active_brand() : null;
+              $all_active_brands = $ci->db->select('id, name, code, logo')
+                                          ->where('is_active', 1)
+                                          ->order_by('name', 'ASC')
+                                          ->get('brands')
+                                          ->result();
+            ?>
+            <style>
+              .brand-switcher-dropdown .brand-item a {
+                padding: 10px 16px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                text-decoration: none !important;
+                transition: background-color 0.15s ease;
+              }
+              .brand-switcher-dropdown .brand-item a:hover {
+                background-color: #f1f5f9 !important;
+              }
+              .brand-switcher-dropdown .brand-item-active {
+                background-color: #eff6ff !important;
+                border-left: 3px solid #2563eb;
+              }
+              .brand-switcher-dropdown .brand-item-active a {
+                background-color: transparent !important;
+                color: #1d4ed8 !important;
+                font-weight: 700 !important;
+              }
+            </style>
+            <li class="dropdown brand-switcher-menu" id="brandSwitcherItem">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 15px 14px; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #1e293b;" title="<?= $active_brand ? 'Brand Aktif: ' . _ent($active_brand->name) : 'Beralih Konteks Brand'; ?>">
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; background: <?= $active_brand ? '#eff6ff' : '#fef3c7' ?>; color: <?= $active_brand ? '#2563eb' : '#d97706' ?>; font-size: 13px;">
+                  <i class="fa fa-briefcase"></i>
+                </span>
+                <span class="hidden-xs" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <?= $active_brand ? _ent($active_brand->name) : 'Semua Brand (All Brands)' ?>
+                </span>
+                <i class="fa fa-angle-down text-muted" style="font-size: 12px; margin-left: 2px;"></i>
+              </a>
+              <ul class="dropdown-menu brand-switcher-dropdown" style="min-width: 280px; max-width: 360px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 0;">
+                <li class="dropdown-header" style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #64748b; padding: 6px 16px;">
+                  Pilih Konteks Brand
+                </li>
+                <li class="brand-item <?= empty($active_brand_id) ? 'brand-item-active' : '' ?>">
+                  <a href="<?= site_url('administrator/brands/switch_context?brand_id=all'); ?>" style="font-weight: <?= empty($active_brand_id) ? '700' : '500' ?>; color: <?= empty($active_brand_id) ? '#1d4ed8' : '#334155' ?>;">
+                    <span style="display: flex; align-items: center; gap: 8px;">
+                      <i class="fa fa-globe" style="font-size: 13px; color: <?= empty($active_brand_id) ? '#2563eb' : '#64748b' ?>;"></i>
+                      <span>Semua Brand (Global View)</span>
+                    </span>
+                    <?php if (empty($active_brand_id)): ?>
+                      <i class="fa fa-check text-primary" style="font-size: 13px;"></i>
+                    <?php endif; ?>
+                  </a>
+                </li>
+                <li class="divider" style="margin: 4px 0;"></li>
+                <?php if (!empty($all_active_brands)): ?>
+                  <?php foreach ($all_active_brands as $b): ?>
+                    <li class="brand-item <?= ($active_brand_id == $b->id) ? 'brand-item-active' : '' ?>">
+                      <a href="<?= site_url('administrator/brands/switch_context?brand_id=' . $b->id); ?>" style="font-weight: <?= ($active_brand_id == $b->id) ? '700' : '500' ?>; color: <?= ($active_brand_id == $b->id) ? '#1d4ed8' : '#334155' ?>;" title="<?= _ent($b->name); ?>">
+                        <span style="display: flex; align-items: center; gap: 8px; max-width: 230px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                          <i class="fa fa-tag" style="font-size: 12px; color: <?= ($active_brand_id == $b->id) ? '#2563eb' : '#94a3b8' ?>;"></i>
+                          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= _ent($b->name); ?></span>
+                        </span>
+                        <?php if ($active_brand_id == $b->id): ?>
+                          <i class="fa fa-check text-primary" style="font-size: 13px;"></i>
+                        <?php endif; ?>
+                      </a>
+                    </li>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+                <li class="divider" style="margin: 4px 0;"></li>
+                <li>
+                  <a href="<?= site_url('administrator/brands/add'); ?>" style="padding: 10px 16px; color: #2563eb; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa fa-plus-circle"></i> Tambah Brand Baru
+                  </a>
+                </li>
+              </ul>
+            </li>
+          <?php elseif (function_exists('get_user_brand_id') && get_user_brand_id() !== null): ?>
+            <?php
+              $scoped_brand = function_exists('get_active_brand') ? get_active_brand() : null;
+            ?>
+            <li class="brand-badge-item" style="display: flex; align-items: center; padding: 10px 14px;">
+              <span class="label brand-badge" style="background: #e8f1fb; color: #1e40af; border: 1px solid #bfdbfe; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;" title="Akses terisolasi pada brand ini">
+                <i class="fa fa-tag" style="color: #3b82f6;"></i>
+                <?= $scoped_brand ? _ent($scoped_brand->name) : 'Brand #' . get_user_brand_id(); ?>
+              </span>
+            </li>
+          <?php endif; ?>
+
           <!-- WhatsApp Console Quick Access with Dynamic Unread Badge -->
           <li class="dropdown messages-menu" id="waNavbarItem">
             <a href="<?= site_url('administrator/whatsapp'); ?>" title="Komunikasi WhatsApp KOL" style="padding: 15px 14px; display: flex; align-items: center; gap: 6px; color: #16a34a; font-weight: 600; position: relative;">

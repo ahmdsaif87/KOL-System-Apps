@@ -89,6 +89,12 @@ class Model_contract_templates extends MY_Model {
     }
 
     public function filter_avaiable() {
+        if (function_exists('get_active_brand_id')) {
+            $brand_id = get_active_brand_id();
+            if ($brand_id !== null) {
+                $this->db->where("(contract_templates.brand_id = " . (int)$brand_id . " OR contract_templates.brand_id IS NULL)");
+            }
+        }
         return $this;
     }
 }
