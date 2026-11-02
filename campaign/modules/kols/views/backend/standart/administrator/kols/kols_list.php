@@ -155,27 +155,68 @@ jQuery(document).ready(domo);
                    $has_advanced_filters = ($advanced_filter_count > 0);
                    $has_active_filters   = ($total_active_filters > 0);
                    ?>
+                   <style>
+                      .kols-filter-toolbar .kols-filter-field,
+                      .kols-filter-toolbar .kols-btn-action {
+                         height: 34px !important;
+                         min-height: 34px !important;
+                         max-height: 34px !important;
+                         padding: 6px 10px !important;
+                         font-size: 12px !important;
+                         line-height: 20px !important;
+                         border-radius: 4px !important;
+                         border: 1px solid #cbd5e1 !important;
+                         box-sizing: border-box !important;
+                         vertical-align: middle !important;
+                      }
+                      .kols-filter-toolbar select.kols-filter-field {
+                         padding: 5px 8px !important;
+                         background-color: #ffffff !important;
+                         cursor: pointer;
+                      }
+                      .kols-filter-toolbar .kols-filter-label {
+                         font-size: 11px !important;
+                         text-transform: uppercase !important;
+                         color: #64748b !important;
+                         font-weight: 600 !important;
+                         height: 16px !important;
+                         line-height: 16px !important;
+                         margin-bottom: 5px !important;
+                         display: flex !important;
+                         align-items: center !important;
+                         gap: 5px !important;
+                         white-space: nowrap !important;
+                         overflow: hidden !important;
+                      }
+                      .kols-filter-toolbar .kols-btn-action {
+                         display: inline-flex !important;
+                         align-items: center !important;
+                         justify-content: center !important;
+                         font-weight: 600 !important;
+                         gap: 4px !important;
+                      }
+                   </style>
                    <!-- Filter Toolbar Card (Streamlined Quick & Advanced Filters) -->
-                   <div class="filter-toolbar-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04); overflow: hidden;">
+                   <div class="filter-toolbar-card kols-filter-toolbar" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
                       
                       <!-- Quick Search & Primary Filters (Always Visible) -->
-                      <div style="padding: 12px 16px; background: #ffffff;">
-                         <div class="row" style="margin-left: -5px; margin-right: -5px; display: flex; align-items: flex-end; flex-wrap: wrap;">
+                      <div style="padding: 12px 16px; background: #ffffff; border-radius: 8px 8px 0 0;">
+                         <div class="row" style="margin-left: -5px; margin-right: -5px;">
                             
                             <!-- 1. Kata Kunci Search -->
                             <div class="col-md-4 col-sm-6 col-xs-12" style="padding: 0 5px; margin-bottom: 6px;">
-                               <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
+                               <label class="kols-filter-label">
                                   <i class="fa fa-search"></i> Kata Kunci
-                                </label>
-                               <input type="text" class="form-control input-sm" name="q" id="filter" placeholder="Cari nama, email, phone, IG, TikTok..." value="<?= _ent($this->input->get('q')); ?>" style="border-radius: 4px; height: 34px;">
+                               </label>
+                               <input type="text" class="form-control kols-filter-field" name="q" id="filter" placeholder="Cari nama, email, phone, IG, TikTok..." value="<?= _ent($this->input->get('q')); ?>">
                             </div>
 
                             <!-- 2. Kategori -->
                             <div class="col-md-2 col-sm-6 col-xs-6" style="padding: 0 5px; margin-bottom: 6px;">
-                               <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
+                               <label class="kols-filter-label">
                                   <i class="fa fa-tags" style="color: #8b5cf6;"></i> Kategori
                                </label>
-                               <select class="form-control input-sm" name="category" id="category" style="border-radius: 4px; height: 34px;">
+                               <select class="form-control kols-filter-field" name="category" id="category">
                                   <option value="">Semua Kategori</option>
                                   <?php if (!empty($all_categories)): ?>
                                      <?php foreach ($all_categories as $c): ?>
@@ -189,10 +230,10 @@ jQuery(document).ready(domo);
 
                             <!-- 3. Tier -->
                             <div class="col-md-2 col-sm-6 col-xs-6" style="padding: 0 5px; margin-bottom: 6px;">
-                               <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
+                               <label class="kols-filter-label">
                                   <i class="fa fa-star text-warning"></i> Tier
                                </label>
-                               <select class="form-control input-sm" name="tier" id="tier" style="border-radius: 4px; height: 34px;">
+                               <select class="form-control kols-filter-field" name="tier" id="tier">
                                   <option value="">Semua Tier</option>
                                   <?php if (!empty($all_tiers)): ?>
                                      <?php foreach ($all_tiers as $t): ?>
@@ -206,10 +247,10 @@ jQuery(document).ready(domo);
 
                             <!-- 4. Urutkan (Sort) -->
                             <div class="col-md-2 col-sm-6 col-xs-6" style="padding: 0 5px; margin-bottom: 6px;">
-                               <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
+                               <label class="kols-filter-label">
                                   <i class="fa fa-sort-amount-desc"></i> Urutkan
                                </label>
-                               <select class="form-control input-sm" name="perf_sort" id="perf_sort" style="border-radius: 4px; height: 34px;">
+                               <select class="form-control kols-filter-field" name="perf_sort" id="perf_sort">
                                   <option value="">Terkini (Default)</option>
                                   <option <?= $this->input->get('perf_sort') == 'gmv_desc' ? 'selected' : ''; ?> value="gmv_desc">GMV Tertinggi</option>
                                   <option <?= $this->input->get('perf_sort') == 'gmv_asc' ? 'selected' : ''; ?> value="gmv_asc">GMV Terendah</option>
@@ -234,23 +275,23 @@ jQuery(document).ready(domo);
 
                             <!-- 5. Actions (Cari, Filter Lanjutan, Reset) -->
                             <div class="col-md-2 col-sm-6 col-xs-6" style="padding: 0 5px; margin-bottom: 6px;">
-                               <label style="font-size: 11px; text-transform: uppercase; color: transparent; font-weight: 600; margin-bottom: 4px; display: block;">&nbsp;</label>
+                               <label class="kols-filter-label" style="color: transparent;">&nbsp;</label>
                                <div style="display: flex; gap: 4px;">
-                                  <button type="submit" class="btn btn-primary btn-sm btn-flat" style="border-radius: 4px; height: 34px; font-weight: 600; flex: 1;">
+                                  <button type="submit" class="btn btn-primary btn-sm btn-flat kols-btn-action" style="flex: 1;">
                                      <i class="fa fa-filter"></i> Filter
                                   </button>
-                                  <button type="button" class="btn <?= $has_advanced_filters ? 'btn-info' : 'btn-default' ?> btn-sm btn-flat" data-toggle="collapse" data-target="#advancedFilterCollapse" title="Filter Lanjutan" style="border-radius: 4px; height: 34px; padding: 6px 9px;">
+                                  <button type="button" class="btn <?= $has_advanced_filters ? 'btn-info' : 'btn-default' ?> btn-sm btn-flat kols-btn-action" data-toggle="collapse" data-target="#advancedFilterCollapse" style="padding: 6px 10px;">
                                      <i class="fa fa-sliders"></i>
                                      <?php if ($advanced_filter_count > 0): ?>
                                         <span class="badge" style="background: #ffffff; color: #0284c7; font-size: 10px; padding: 2px 4px; font-weight: 700;"><?= $advanced_filter_count; ?></span>
                                      <?php endif; ?>
                                   </button>
                                   <?php if ($has_active_filters): ?>
-                                     <a href="<?= base_url('administrator/kols');?>" class="btn btn-default btn-sm btn-flat" title="Reset Semua Filter" style="border-radius: 4px; height: 34px; padding: 6px 9px; color: #ef4444; border-color: #fecaca; background: #fef2f2;">
+                                     <a href="<?= base_url('administrator/kols');?>" class="btn btn-default btn-sm btn-flat kols-btn-action" title="Reset Filter" style="padding: 6px 10px; color: #ef4444; border-color: #fecaca; background: #fef2f2;">
                                         <i class="fa fa-undo"></i>
                                      </a>
                                   <?php endif; ?>
-                               </div>
+                                </div>
                             </div>
 
                          </div>
@@ -258,7 +299,7 @@ jQuery(document).ready(domo);
 
                       <!-- Collapsible Advanced Filters Section -->
                       <div class="collapse <?= $has_advanced_filters ? 'in' : '' ?>" id="advancedFilterCollapse">
-                         <div style="padding: 12px 16px 8px; background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                         <div style="padding: 12px 16px 8px; background: #f8fafc; border-top: 1px solid #e2e8f0; border-radius: 0 0 8px 8px;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                                <span style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.3px;">
                                   <i class="fa fa-sliders text-info"></i> Parameter Filter Lanjutan
@@ -269,10 +310,10 @@ jQuery(document).ready(domo);
                             <div class="row" style="margin-left: -5px; margin-right: -5px;">
                                <!-- Gender -->
                                <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
-                                  <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
+                                  <label class="kols-filter-label">
                                      <i class="fa fa-venus-mars text-info"></i> Gender
                                   </label>
-                                  <select class="form-control input-sm" name="gender" id="gender" style="border-radius: 4px; height: 32px;">
+                                  <select class="form-control kols-filter-field" name="gender" id="gender">
                                      <option value="">Semua Gender</option>
                                      <option value="MALE" <?= strtoupper($this->input->get('gender') ?? '') === 'MALE' ? 'selected' : ''; ?>>Laki-laki</option>
                                      <option value="FEMALE" <?= strtoupper($this->input->get('gender') ?? '') === 'FEMALE' ? 'selected' : ''; ?>>Perempuan</option>
@@ -281,10 +322,10 @@ jQuery(document).ready(domo);
 
                                <!-- Platform -->
                                <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
-                                  <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
+                                  <label class="kols-filter-label">
                                      <i class="fa fa-globe text-primary"></i> Platform
                                   </label>
-                                  <select class="form-control input-sm" name="perf_platform" id="perf_platform" style="border-radius: 4px; height: 32px;">
+                                  <select class="form-control kols-filter-field" name="perf_platform" id="perf_platform">
                                      <option value="">Semua Platform</option>
                                      <?php if (!empty($all_platforms)): ?>
                                         <?php foreach ($all_platforms as $p): ?>
@@ -298,10 +339,10 @@ jQuery(document).ready(domo);
 
                                <!-- Status Data -->
                                <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
-                                  <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
+                                  <label class="kols-filter-label">
                                      <i class="fa fa-database"></i> Status Data
                                   </label>
-                                  <select class="form-control input-sm" name="perf_status" id="perf_status" style="border-radius: 4px; height: 32px;">
+                                  <select class="form-control kols-filter-field" name="perf_status" id="perf_status">
                                      <option value="">Semua Data</option>
                                      <option value="synced" <?= $this->input->get('perf_status') == 'synced' ? 'selected' : ''; ?>>Ada Data Scrape</option>
                                      <option value="has_gmv" <?= $this->input->get('perf_status') == 'has_gmv' ? 'selected' : ''; ?>>Ada GMV TikTok</option>
@@ -311,32 +352,30 @@ jQuery(document).ready(domo);
 
                                <!-- Min Avg Views -->
                                <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
-                                  <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
+                                  <label class="kols-filter-label">
                                      <i class="fa fa-eye text-info"></i> Min Views (30D)
                                   </label>
-                                  <input type="number" step="1000" min="0" class="form-control input-sm" name="perf_min_views" id="perf_min_views" placeholder="Contoh: 50000" value="<?= _ent($this->input->get('perf_min_views')); ?>" style="border-radius: 4px; height: 32px;">
-                               </div>
+                                  <input type="number" step="1000" min="0" class="form-control kols-filter-field" name="perf_min_views" id="perf_min_views" placeholder="Contoh: 50000" value="<?= _ent($this->input->get('perf_min_views')); ?>">
+                                </div>
 
                                <!-- Min Avg ER % -->
                                <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
-                                  <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
+                                  <label class="kols-filter-label">
                                      <i class="fa fa-line-chart text-success"></i> Min Avg ER (%)
                                   </label>
-                                  <input type="number" step="0.1" min="0" max="100" class="form-control input-sm" name="perf_min_er" id="perf_min_er" placeholder="Contoh: 5 (%)" value="<?= _ent($this->input->get('perf_min_er')); ?>" style="border-radius: 4px; height: 32px;">
+                                  <input type="number" step="0.1" min="0" max="100" class="form-control kols-filter-field" name="perf_min_er" id="perf_min_er" placeholder="Contoh: 5 (%)" value="<?= _ent($this->input->get('perf_min_er')); ?>">
                                </div>
 
                                <!-- Min GMV (Rp) -->
                                <div class="col-md-2 col-sm-4 col-xs-6" style="padding: 0 5px; margin-bottom: 8px;">
-                                  <label style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">
+                                  <label class="kols-filter-label">
                                      <i class="fa fa-shopping-bag text-success"></i> Min GMV (Rp)
                                   </label>
-                                  <input type="number" step="1000000" min="0" class="form-control input-sm" name="perf_min_gmv" id="perf_min_gmv" placeholder="Contoh: 10000000" value="<?= _ent($this->input->get('perf_min_gmv')); ?>" style="border-radius: 4px; height: 32px;">
+                                  <input type="number" step="1000000" min="0" class="form-control kols-filter-field" name="perf_min_gmv" id="perf_min_gmv" placeholder="Contoh: 10000000" value="<?= _ent($this->input->get('perf_min_gmv')); ?>">
                                </div>
                             </div>
                          </div>
-                      </div>
-
-                   </div>
+                      </div>                   </div>
 
                 <!-- Active Filter Pills (if any filter is applied) -->
                 <?php if ($has_active_filters): ?>
