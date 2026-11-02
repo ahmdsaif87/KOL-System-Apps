@@ -1,3 +1,20 @@
+# Set production environment (QA-003)
+SetEnv CI_ENV production
+
+# Block sensitive files (QA-004)
+<FilesMatch "(?i)\.(sql|log|md|bak|env|json|git|gitignore|yml|yaml|ini)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Security Headers (QA-006)
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
 <IfModule mod_rewrite.c>
   	RewriteEngine on
  
