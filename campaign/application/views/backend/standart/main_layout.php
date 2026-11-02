@@ -206,7 +206,7 @@
                   <i class="fa fa-briefcase"></i>
                 </span>
                 <span class="hidden-xs" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                  <?= $active_brand ? _ent($active_brand->name) : '🌟 Semua Brand (All Brands)' ?>
+                  <?= $active_brand ? _ent($active_brand->name) : 'Semua Brand (All Brands)' ?>
                 </span>
                 <i class="fa fa-angle-down text-muted" style="font-size: 12px; margin-left: 2px;"></i>
               </a>
@@ -217,11 +217,11 @@
                 <li class="brand-item <?= empty($active_brand_id) ? 'brand-item-active' : '' ?>">
                   <a href="<?= site_url('administrator/brands/switch_context?brand_id=all'); ?>" style="font-weight: <?= empty($active_brand_id) ? '700' : '500' ?>; color: <?= empty($active_brand_id) ? '#1d4ed8' : '#334155' ?>;">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                      <span style="font-size: 14px;">🌟</span>
+                      <i class="fa fa-globe" style="font-size: 13px; color: <?= empty($active_brand_id) ? '#2563eb' : '#64748b' ?>;"></i>
                       <span>Semua Brand (Global View)</span>
                     </span>
                     <?php if (empty($active_brand_id)): ?>
-                      <span class="badge" style="background-color: #2563eb; color: #fff; font-size: 10px; font-weight: 600; padding: 3px 6px; border-radius: 4px;">Aktif</span>
+                      <i class="fa fa-check text-primary" style="font-size: 13px;"></i>
                     <?php endif; ?>
                   </a>
                 </li>
@@ -230,12 +230,12 @@
                   <?php foreach ($all_active_brands as $b): ?>
                     <li class="brand-item <?= ($active_brand_id == $b->id) ? 'brand-item-active' : '' ?>">
                       <a href="<?= site_url('administrator/brands/switch_context?brand_id=' . $b->id); ?>" style="font-weight: <?= ($active_brand_id == $b->id) ? '700' : '500' ?>; color: <?= ($active_brand_id == $b->id) ? '#1d4ed8' : '#334155' ?>;" title="<?= _ent($b->name); ?>">
-                        <span style="display: flex; align-items: center; gap: 8px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                          <span style="font-size: 14px;">🏷️</span>
+                        <span style="display: flex; align-items: center; gap: 8px; max-width: 230px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                          <i class="fa fa-tag" style="font-size: 12px; color: <?= ($active_brand_id == $b->id) ? '#2563eb' : '#94a3b8' ?>;"></i>
                           <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= _ent($b->name); ?></span>
                         </span>
                         <?php if ($active_brand_id == $b->id): ?>
-                          <span class="badge" style="background-color: #2563eb; color: #fff; font-size: 10px; font-weight: 600; padding: 3px 6px; border-radius: 4px;">Aktif</span>
+                          <i class="fa fa-check text-primary" style="font-size: 13px;"></i>
                         <?php endif; ?>
                       </a>
                     </li>

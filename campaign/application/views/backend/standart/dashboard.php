@@ -435,7 +435,9 @@
             ?>
             <?php if ($dash_active_brand): ?>
                 <div style="display: inline-flex; align-items: center; gap: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 7px 16px; box-shadow: 0 1px 2px rgba(37, 99, 235, 0.05);">
-                    <div style="width: 28px; height: 28px; border-radius: 6px; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 14px;">🏷️</div>
+                    <div style="width: 28px; height: 28px; border-radius: 6px; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #2563eb;">
+                        <i class="fa fa-tag"></i>
+                    </div>
                     <div>
                         <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: #2563eb; letter-spacing: 0.5px; line-height: 1;">Konteks Brand Aktif</div>
                         <div style="font-size: 13px; font-weight: 700; color: #1e3a8a; margin-top: 2px;">
@@ -445,7 +447,9 @@
                 </div>
             <?php else: ?>
                 <div style="display: inline-flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 7px 16px;">
-                    <div style="width: 28px; height: 28px; border-radius: 6px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 14px;">🌟</div>
+                    <div style="width: 28px; height: 28px; border-radius: 6px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #64748b;">
+                        <i class="fa fa-globe"></i>
+                    </div>
                     <div>
                         <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: #64748b; letter-spacing: 0.5px; line-height: 1;">Konteks Brand</div>
                         <div style="font-size: 13px; font-weight: 700; color: #334155; margin-top: 2px;">Semua Brand (Global View)</div>
