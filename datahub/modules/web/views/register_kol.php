@@ -173,16 +173,16 @@
                             </div>
                         </div>
 
+
+                        
                         <div class="form-group ">
-                            <label for="rate_card_file" class="col-sm-2 control-label">Rate Card File <i class="required">*</i></label>
+                            <label for="price_vt" class="col-sm-2 control-label">Rate Card (Short Form) </label>
                             <div class="col-sm-8">
-                                <div id="kols_rate_card_file_galery"></div>
-                                <input class="data_file" name="kols_rate_card_file_uuid" id="kols_rate_card_file_uuid" type="hidden" value="">
-                                <input class="data_file" name="kols_rate_card_file_name" id="kols_rate_card_file_name" type="hidden" value="">
-                                <small class="info help-block"><b>Input Rate Card File</b> Max Length : 500.</small>
+                                <input type="number" class="form-control" name="price_vt" id="price_vt" placeholder="Estimasi Rate Card / Short Form Video (Rp)" value="<?= set_value('price_vt'); ?>">
+                                <small class="info help-block">Estimasi tarif rate card numerik untuk short form video (opsional).</small>
                             </div>
                         </div>
-                        
+
                         <div class="form-group ">
                             <label for="avatar_url" class="col-sm-2 control-label">Avatar URL <i class="required">*</i></label>
                             <div class="col-sm-8">
@@ -466,58 +466,6 @@
         .always(function() {
           $('.loading_user').hide();
         });
-      });
-      
-      var params = {};
-      var csrf = '<?= $this->security->get_csrf_token_name(); ?>';
-      var token = '<?= $this->security->get_csrf_hash(); ?>';
-      params[csrf] = token;
-
-      $('#kols_rate_card_file_galery').fineUploader({
-          template: 'qq-template-gallery',
-          request: {
-              endpoint: BASE_URL + 'web/register/upload_rate_card_file',
-              params : params
-          },
-          deleteFile: {
-              enabled: true, 
-              endpoint: BASE_URL + 'web/register/delete_rate_card_file',
-          },
-          thumbnails: {
-              placeholders: {
-                  waitingPath: BASE_URL + '/asset/fine-upload/placeholders/waiting-generic.png',
-                  notAvailablePath: BASE_URL + '/asset/fine-upload/placeholders/not_available-generic.png'
-              }
-          },
-          multiple : false,
-          validation: {
-              allowedExtensions: ["*"],
-              sizeLimit : 0,
-          },
-          showMessage: function(msg) {
-              toastr['error'](msg);
-          },
-          callbacks: {
-              onComplete : function(id, name, xhr) {
-                if (xhr.success) {
-                   var uuid = $('#kols_rate_card_file_galery').fineUploader('getUuid', id);
-                   $('#kols_rate_card_file_uuid').val(uuid);
-                   $('#kols_rate_card_file_name').val(xhr.uploadName);
-                } else {
-                   toastr['error'](xhr.error);
-                }
-              },
-              onSubmit : function(id, name) {
-                  var uuid = $('#kols_rate_card_file_uuid').val();
-                  $.get(BASE_URL + 'web/register/delete_rate_card_file/' + uuid);
-              },
-              onDeleteComplete : function(id, xhr, isError) {
-                if (isError == false) {
-                  $('#kols_rate_card_file_uuid').val('');
-                  $('#kols_rate_card_file_name').val('');
-                }
-              }
-          }
       });
     }); 
 </script>

@@ -5,6 +5,7 @@ class Model_campaigns extends MY_Model {
 
     private $primary_key    = 'id';
     private $table_name     = 'campaigns';
+    protected $brand_scoped = TRUE;
     private $field_search   = ['name', 'budget', 'start_date', 'end_date', 'status', 'campaign_type', 'brand_name', 'client_name', 'brand_category', 'target_views', 'target_er', 'target_cpv', 'target_cpe', 'created_by', 'created_at', 'updated_at', 'pic_user_id'];
 
     public function __construct()
@@ -102,7 +103,7 @@ class Model_campaigns extends MY_Model {
     }
 
     public function filter_avaiable() {
-
+        $this->apply_brand_scope('campaigns');
         if (!$this->aauth->is_admin()) {
             }
 

@@ -729,7 +729,11 @@ if (!function_exists('get_platform_chip_meta')) {
                                 </h3>
 
                                 <div class="camp-brand-row">
-                                    <i class="fa fa-tag text-muted"></i>
+                                    <?php if (!empty($camp->brand_logo)): ?>
+                                        <img src="<?= base_url($camp->brand_logo); ?>" alt="brand logo" style="height: 14px; width: auto; border-radius: 2px; vertical-align: middle; margin-right: 4px;" onerror="this.style.display='none'">
+                                    <?php else: ?>
+                                        <i class="fa fa-tag text-muted"></i>
+                                    <?php endif; ?>
                                     <span><?= !empty($camp->brand_name) ? _ent($camp->brand_name) : 'Brand Sponsor'; ?></span>
                                     <?php if (!empty($camp->brand_category)): ?>
                                         <span>&bull; <?= _ent($camp->brand_category); ?></span>

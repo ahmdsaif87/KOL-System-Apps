@@ -21,11 +21,16 @@ class Model_open_campaigns extends MY_Model
     {
         $today = date('Y-m-d');
 
-        $this->db->select('c.*, u.full_name as pic_name')
+        $this->db->select('c.*, u.full_name as pic_name, COALESCE(b.name, c.brand_name) as brand_name, b.logo as brand_logo, b.description as brand_description')
             ->from('campaigns c')
             ->join('aauth_users u', 'u.id = c.pic_user_id', 'left')
+            ->join('brands b', 'b.id = c.brand_id', 'left')
             ->where('c.sourcing_model', 'OPEN_POST')
             ->where('c.status', 'OPEN_REGISTRATION')
+            ->group_start()
+                ->where('b.is_active', 1)
+                ->or_where('b.is_active IS NULL')
+            ->group_end()
             ->group_start()
                 ->where('c.application_deadline >=', $today)
                 ->or_where('c.application_deadline IS NULL')

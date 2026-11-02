@@ -166,6 +166,75 @@
       <?php if ($this->aauth->get_user()): ?>
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
+          <!-- Multi-Brand Tenancy Navigation Component (Milestone 3) -->
+          <?php if (function_exists('is_superadmin') && is_superadmin()): ?>
+            <?php
+              $ci =& get_instance();
+              $active_brand_id = function_exists('get_active_brand_id') ? get_active_brand_id() : null;
+              $active_brand = function_exists('get_active_brand') ? get_active_brand() : null;
+              $all_active_brands = $ci->db->select('id, name, code, logo')
+                                          ->where('is_active', 1)
+                                          ->order_by('name', 'ASC')
+                                          ->get('brands')
+                                          ->result();
+            ?>
+            <li class="dropdown brand-switcher-menu" id="brandSwitcherItem">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 15px 14px; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #1e293b;" title="Beralih Konteks Brand">
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; background: <?= $active_brand ? '#eff6ff' : '#fef3c7' ?>; color: <?= $active_brand ? '#2563eb' : '#d97706' ?>; font-size: 13px;">
+                  <i class="fa fa-briefcase"></i>
+                </span>
+                <span class="hidden-xs" style="max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <?= $active_brand ? _ent($active_brand->name) : '🌟 Semua Brand (All Brands)' ?>
+                </span>
+                <i class="fa fa-angle-down text-muted" style="font-size: 12px; margin-left: 2px;"></i>
+              </a>
+              <ul class="dropdown-menu" style="min-width: 250px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 0;">
+                <li class="dropdown-header" style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #64748b; padding: 6px 16px;">
+                  Pilih Konteks Brand
+                </li>
+                <li class="<?= empty($active_brand_id) ? 'active' : '' ?>">
+                  <a href="<?= site_url('administrator/brands/switch_context?brand_id=all'); ?>" style="padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; font-weight: <?= empty($active_brand_id) ? '700' : '500' ?>; color: <?= empty($active_brand_id) ? '#2563eb' : '#334155' ?>;">
+                    <span>🌟 Semua Brand (Global View)</span>
+                    <?php if (empty($active_brand_id)): ?>
+                      <i class="fa fa-check text-primary"></i>
+                    <?php endif; ?>
+                  </a>
+                </li>
+                <li class="divider" style="margin: 4px 0;"></li>
+                <?php if (!empty($all_active_brands)): ?>
+                  <?php foreach ($all_active_brands as $b): ?>
+                    <li class="<?= ($active_brand_id == $b->id) ? 'active' : '' ?>">
+                      <a href="<?= site_url('administrator/brands/switch_context?brand_id=' . $b->id); ?>" style="padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; font-weight: <?= ($active_brand_id == $b->id) ? '700' : '500' ?>; color: <?= ($active_brand_id == $b->id) ? '#2563eb' : '#334155' ?>;">
+                        <span style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                          🏷️ <?= _ent($b->name); ?>
+                        </span>
+                        <?php if ($active_brand_id == $b->id): ?>
+                          <i class="fa fa-check text-primary"></i>
+                        <?php endif; ?>
+                      </a>
+                    </li>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+                <li class="divider" style="margin: 4px 0;"></li>
+                <li>
+                  <a href="<?= site_url('administrator/brands/add'); ?>" style="padding: 8px 16px; color: #2563eb; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa fa-plus-circle"></i> Tambah Brand Baru
+                  </a>
+                </li>
+              </ul>
+            </li>
+          <?php elseif (function_exists('get_user_brand_id') && get_user_brand_id() !== null): ?>
+            <?php
+              $scoped_brand = function_exists('get_active_brand') ? get_active_brand() : null;
+            ?>
+            <li class="brand-badge-item" style="display: flex; align-items: center; padding: 10px 14px;">
+              <span class="label brand-badge" style="background: #e8f1fb; color: #1e40af; border: 1px solid #bfdbfe; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;" title="Akses terisolasi pada brand ini">
+                <i class="fa fa-tag" style="color: #3b82f6;"></i>
+                <?= $scoped_brand ? _ent($scoped_brand->name) : 'Brand #' . get_user_brand_id(); ?>
+              </span>
+            </li>
+          <?php endif; ?>
+
           <!-- WhatsApp Console Quick Access with Dynamic Unread Badge -->
           <li class="dropdown messages-menu" id="waNavbarItem">
             <a href="<?= site_url('administrator/whatsapp'); ?>" title="Komunikasi WhatsApp KOL" style="padding: 15px 14px; display: flex; align-items: center; gap: 6px; color: #16a34a; font-weight: 600; position: relative;">

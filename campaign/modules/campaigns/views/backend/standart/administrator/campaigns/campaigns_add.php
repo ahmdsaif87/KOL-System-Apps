@@ -179,13 +179,17 @@
                                         <select class="form-control chosen chosen-select-deselect" name="pic_user_id" id="pic_user_id" data-placeholder="Pilih PIC User Id" >
                                             <option value=""></option>
                                             <?php 
-                                            $staff_users = $this->db->select('u.id, u.full_name, GROUP_CONCAT(DISTINCT g.name ORDER BY g.id SEPARATOR " / ") as role_name')
+                                            $active_brand_id = function_exists('get_active_brand_id') ? get_active_brand_id() : null;
+                                            $pic_builder = $this->db->select('u.id, u.full_name, GROUP_CONCAT(DISTINCT g.name ORDER BY g.id SEPARATOR " / ") as role_name')
                                                 ->from('aauth_users u')
                                                 ->join('aauth_user_to_group utg', 'utg.user_id = u.id')
                                                 ->join('aauth_groups g', 'g.id = utg.group_id')
                                                 ->where_in('g.name', ['Admin', 'Leader KOL', 'Operational'])
-                                                ->where('u.banned', 0)
-                                                ->group_by('u.id')
+                                                ->where('u.banned', 0);
+                                            if ($active_brand_id !== null) {
+                                                $pic_builder->where('u.brand_id', (int)$active_brand_id);
+                                            }
+                                            $staff_users = $pic_builder->group_by('u.id')
                                                 ->order_by('u.full_name', 'ASC')
                                                 ->get()->result();
                                             foreach ($staff_users as $row): 

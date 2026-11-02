@@ -15,12 +15,15 @@ class Model_my_contracts extends CI_Model {
             ck.deal_amount,
             ck.campaign_id,
             c.name as campaign_name,
-            c.brand_name,
+            COALESCE(b.name, c.brand_name) as brand_name,
+            b.company_name as brand_company_name,
+            b.logo as brand_logo,
             k.name as kol_name
         ');
         $this->db->from('campaign_kol_contracts ckc');
         $this->db->join('campaign_kols ck', 'ck.id = ckc.campaign_kol_id');
         $this->db->join('campaigns c', 'c.id = ck.campaign_id', 'left');
+        $this->db->join('brands b', 'b.id = c.brand_id', 'left');
         $this->db->join('kols k', 'k.id = ck.kol_id', 'left');
         $this->db->where('ck.kol_id', (int)$kol_id);
         $this->db->order_by('ckc.id', 'DESC');
@@ -35,7 +38,9 @@ class Model_my_contracts extends CI_Model {
             ck.deal_amount,
             ck.kol_id,
             c.name as campaign_name,
-            c.brand_name,
+            COALESCE(b.name, c.brand_name) as brand_name,
+            b.company_name as brand_company_name,
+            b.logo as brand_logo,
             k.name as kol_name,
             k.ktp_number,
             k.npwp_number,
@@ -47,6 +52,7 @@ class Model_my_contracts extends CI_Model {
         $this->db->from('campaign_kol_contracts ckc');
         $this->db->join('campaign_kols ck', 'ck.id = ckc.campaign_kol_id');
         $this->db->join('campaigns c', 'c.id = ck.campaign_id', 'left');
+        $this->db->join('brands b', 'b.id = c.brand_id', 'left');
         $this->db->join('kols k', 'k.id = ck.kol_id', 'left');
         $this->db->where('ckc.id', (int)$contract_id);
         if ($kol_id !== null) {

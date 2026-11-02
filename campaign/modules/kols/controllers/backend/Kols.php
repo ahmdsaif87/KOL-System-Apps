@@ -189,7 +189,7 @@ class Kols extends Admin
 		$this->form_validation->set_rules('address', 'Address', 'trim|required');
 		$this->form_validation->set_rules('country', 'Country', 'trim|required|max_length[50]');
 		$this->form_validation->set_rules('categories[]', 'Categories', 'required');
-		$this->form_validation->set_rules('kols_rate_card_file_name', 'Rate Card File', 'trim|required|max_length[500]');
+		$this->form_validation->set_rules('kols_rate_card_file_name', 'Rate Card File', 'trim|max_length[500]');
 		$this->form_validation->set_rules('avatar_url', 'Avatar URL', 'trim|required|max_length[2000]');
 		
 		$this->form_validation->set_rules('bank_name', 'Bank Name', 'trim|max_length[100]');

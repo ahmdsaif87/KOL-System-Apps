@@ -400,11 +400,46 @@ dl.dl-horizontal dd { margin-left: 150px; color: #1e293b; font-weight: 500; marg
             <!-- TAB OVERVIEW -->
             <div class="tab-pane active" id="tab_overview">
                <div class="row">
+                  <?php
+                    $can_view_bank = $this->aauth->is_allowed('kols_view_bank_detail') || (function_exists('is_superadmin') && is_superadmin());
+
+                    $display_phone = '-';
+                    if (!empty($kols->phone)) {
+                        if ($can_view_bank) {
+                            $display_phone = _ent($kols->phone);
+                        } else {
+                            $clean_p = trim($kols->phone);
+                            $len = strlen($clean_p);
+                            if ($len >= 8) {
+                                $display_phone = substr($clean_p, 0, 4) . '••••' . substr($clean_p, -4);
+                            } else {
+                                $display_phone = substr($clean_p, 0, 2) . '••••' . substr($clean_p, -2);
+                            }
+                        }
+                    }
+
+                    $display_email = '-';
+                    if (!empty($kols->email)) {
+                        if ($can_view_bank) {
+                            $display_email = _ent($kols->email);
+                        } else {
+                            $parts = explode('@', $kols->email);
+                            if (count($parts) == 2) {
+                                $name_part = $parts[0];
+                                $domain_part = $parts[1];
+                                $masked_name = (strlen($name_part) > 2) ? substr($name_part, 0, 2) . '••••' : $name_part . '••••';
+                                $display_email = $masked_name . '@' . $domain_part;
+                            } else {
+                                $display_email = '••••@••••';
+                            }
+                        }
+                    }
+                  ?>
                   <div class="col-md-6">
                      <h4 class="section-title">Profile Information</h4>
                      <dl class="dl-horizontal">
-                        <dt>Phone</dt><dd><?= _ent($kols->phone) ?: '-'; ?></dd>
-                        <dt>Email</dt><dd><?= _ent($kols->email) ?: '-'; ?></dd>
+                        <dt>Phone</dt><dd><?= $display_phone; ?></dd>
+                        <dt>Email</dt><dd><?= $display_email; ?></dd>
                         <dt>Date of Birth</dt><dd><?= !empty($kols->date_of_birth) ? date('d M Y', strtotime($kols->date_of_birth)) : '-'; ?></dd>
                         <dt>Gender</dt><dd><?= _ent($kols->gender) ?: '-'; ?></dd>
                         <dt>Address</dt><dd><?= _ent($kols->address) ?: '-'; ?></dd>
@@ -420,6 +455,7 @@ dl.dl-horizontal dd { margin-left: 150px; color: #1e293b; font-weight: 500; marg
                   </div>
                   <div class="col-md-6">
                      <h4 class="section-title">Commercial / Financial</h4>
+                     <?php if ($this->aauth->is_allowed('kols_view_bank_detail') || (function_exists('is_superadmin') && is_superadmin())): ?>
                      <dl class="dl-horizontal">
                         <dt>Bank Name</dt><dd><?= _ent($kols->bank_name) ?: '-'; ?></dd>
                         <dt>Account Number</dt><dd><?= _ent($kols->bank_account_number) ?: '-'; ?></dd>
@@ -428,6 +464,11 @@ dl.dl-horizontal dd { margin-left: 150px; color: #1e293b; font-weight: 500; marg
                         <dt>Created By</dt><dd><?= _ent(!empty($kols->created_by_name) ? $kols->created_by_name : ($kols->created_by ?? '-')); ?></dd>
                         <dt>Approved By</dt><dd><?= isset($kols->approved_by_name) ? _ent($kols->approved_by_name) : (isset($kols->approved_by) ? _ent($kols->approved_by) : '-'); ?></dd>
                      </dl>
+                     <?php else: ?>
+                     <div class="alert alert-info" style="padding: 10px; font-size: 12px; margin-bottom: 0;">
+                        <i class="fa fa-lock"></i> Informasi rekening bank dan data pembayaran dilindungi untuk peran Keuangan / Finance.
+                     </div>
+                     <?php endif; ?>
                   </div>
                </div>
             </div>
@@ -664,22 +705,28 @@ dl.dl-horizontal dd { margin-left: 150px; color: #1e293b; font-weight: 500; marg
                      <?php endif; ?>
                   <?php endif; ?>
                   
-                  <?php if (!empty($kols->ktp_number)): ?>
-                     <div style="margin: 10px 0;"><strong>No. KTP:</strong> <?= _ent($kols->ktp_number); ?></div>
-                  <?php endif; ?>
-                  <?php if (!empty($kols->ktp_file)): ?>
-                     <a href="<?= BASE_URL . 'administrator/file/download/kols/' . $kols->ktp_file; ?>" class="doc-link">
-                        File KTP
-                     </a>
-                  <?php endif; ?>
-                  
-                  <?php if (!empty($kols->npwp_number)): ?>
-                     <div style="margin: 10px 0;"><strong>No. NPWP:</strong> <?= _ent($kols->npwp_number); ?></div>
-                  <?php endif; ?>
-                  <?php if (!empty($kols->npwp_file)): ?>
-                     <a href="<?= BASE_URL . 'administrator/file/download/kols/' . $kols->npwp_file; ?>" class="doc-link">
-                        File NPWP
-                     </a>
+                  <?php if ($this->aauth->is_allowed('kols_view_bank_detail') || (function_exists('is_superadmin') && is_superadmin())): ?>
+                     <?php if (!empty($kols->ktp_number)): ?>
+                        <div style="margin: 10px 0;"><strong>No. KTP:</strong> <?= _ent($kols->ktp_number); ?></div>
+                     <?php endif; ?>
+                     <?php if (!empty($kols->ktp_file)): ?>
+                        <a href="<?= BASE_URL . 'administrator/file/download/kols/' . $kols->ktp_file; ?>" class="doc-link">
+                           File KTP
+                        </a>
+                     <?php endif; ?>
+                     
+                     <?php if (!empty($kols->npwp_number)): ?>
+                        <div style="margin: 10px 0;"><strong>No. NPWP:</strong> <?= _ent($kols->npwp_number); ?></div>
+                     <?php endif; ?>
+                     <?php if (!empty($kols->npwp_file)): ?>
+                        <a href="<?= BASE_URL . 'administrator/file/download/kols/' . $kols->npwp_file; ?>" class="doc-link">
+                           File NPWP
+                        </a>
+                     <?php endif; ?>
+                  <?php else: ?>
+                     <div class="alert alert-info" style="padding: 10px; font-size: 12px; margin-top: 10px;">
+                        <i class="fa fa-lock"></i> Data NIK/NPWP dan dokumen identitas disembunyikan untuk privasi.
+                     </div>
                   <?php endif; ?>
                </div>
 

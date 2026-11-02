@@ -528,6 +528,14 @@
                            <!-- Left: Content Info -->
                            <div class="deliverable-content">
                               <div class="deliverable-top-meta">
+                                 <?php if (!empty($t->brand_name)): ?>
+                                    <span class="meta-chip brand-chip" style="background:#eff6ff; color:#1d4ed8; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                                       <?php if (!empty($t->brand_logo)): ?>
+                                          <img src="<?= base_url($t->brand_logo); ?>" alt="logo" style="height:13px; width:auto; border-radius:2px;" onerror="this.style.display='none'">
+                                       <?php endif; ?>
+                                       <i class="fa fa-briefcase"></i> <?= _ent($t->brand_name); ?>
+                                    </span>
+                                 <?php endif; ?>
                                  <span class="card-campaign-chip">
                                     <?= _ent($t->campaign_title ?: 'Campaign'); ?>
                                  </span>

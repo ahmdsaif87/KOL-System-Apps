@@ -5,6 +5,7 @@ class Model_products extends MY_Model {
 
     private $primary_key    = 'id';
     private $table_name     = 'products';
+    protected $brand_scoped = TRUE;
     private $field_search   = ['sku', 'name', 'category', 'stock', 'price', 'is_active'];
 
     public function __construct()
@@ -93,7 +94,7 @@ class Model_products extends MY_Model {
     }
 
     public function filter_avaiable() {
-
+        $this->apply_brand_scope('products');
         if (!$this->aauth->is_admin()) {
             }
 
