@@ -1,0 +1,25 @@
+{
+  "name": "kol-system",
+  "version": "1.0.0",
+  "description": "A CodeIgniter 3 application built on the Cicool starter, designed to track KOL (Key Opinion Leader) collaborations through the full marketing campaign lifecycle — from KOL registration through content briefing, posting, and performance analytics.",
+  "main": "index.js",
+  "scripts": {
+    "test:sentiment": "node scripts/test_sentiment_hf.mjs",
+    "test:e2e": "NODE_PATH=node_modules node scripts/run_full_playwright_test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DitaPutraPratama/ci3_metafora.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DitaPutraPratama/ci3_metafora/issues"
+  },
+  "homepage": "https://github.com/DitaPutraPratama/ci3_metafora#readme",
+  "devDependencies": {
+    "@gradio/client": "^2.7.2",
+    "playwright": "^1.64.1"
+  }
+}
