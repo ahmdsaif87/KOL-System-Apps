@@ -178,38 +178,64 @@
                                           ->get('brands')
                                           ->result();
             ?>
+            <style>
+              .brand-switcher-dropdown .brand-item a {
+                padding: 10px 16px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                text-decoration: none !important;
+                transition: background-color 0.15s ease;
+              }
+              .brand-switcher-dropdown .brand-item a:hover {
+                background-color: #f1f5f9 !important;
+              }
+              .brand-switcher-dropdown .brand-item-active {
+                background-color: #eff6ff !important;
+                border-left: 3px solid #2563eb;
+              }
+              .brand-switcher-dropdown .brand-item-active a {
+                background-color: transparent !important;
+                color: #1d4ed8 !important;
+                font-weight: 700 !important;
+              }
+            </style>
             <li class="dropdown brand-switcher-menu" id="brandSwitcherItem">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 15px 14px; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #1e293b;" title="Beralih Konteks Brand">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 15px 14px; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #1e293b;" title="<?= $active_brand ? 'Brand Aktif: ' . _ent($active_brand->name) : 'Beralih Konteks Brand'; ?>">
                 <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; background: <?= $active_brand ? '#eff6ff' : '#fef3c7' ?>; color: <?= $active_brand ? '#2563eb' : '#d97706' ?>; font-size: 13px;">
                   <i class="fa fa-briefcase"></i>
                 </span>
-                <span class="hidden-xs" style="max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <span class="hidden-xs" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   <?= $active_brand ? _ent($active_brand->name) : '🌟 Semua Brand (All Brands)' ?>
                 </span>
                 <i class="fa fa-angle-down text-muted" style="font-size: 12px; margin-left: 2px;"></i>
               </a>
-              <ul class="dropdown-menu" style="min-width: 250px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 0;">
+              <ul class="dropdown-menu brand-switcher-dropdown" style="min-width: 280px; max-width: 360px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 0;">
                 <li class="dropdown-header" style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #64748b; padding: 6px 16px;">
                   Pilih Konteks Brand
                 </li>
-                <li class="<?= empty($active_brand_id) ? 'active' : '' ?>">
-                  <a href="<?= site_url('administrator/brands/switch_context?brand_id=all'); ?>" style="padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; font-weight: <?= empty($active_brand_id) ? '700' : '500' ?>; color: <?= empty($active_brand_id) ? '#2563eb' : '#334155' ?>;">
-                    <span>🌟 Semua Brand (Global View)</span>
+                <li class="brand-item <?= empty($active_brand_id) ? 'brand-item-active' : '' ?>">
+                  <a href="<?= site_url('administrator/brands/switch_context?brand_id=all'); ?>" style="font-weight: <?= empty($active_brand_id) ? '700' : '500' ?>; color: <?= empty($active_brand_id) ? '#1d4ed8' : '#334155' ?>;">
+                    <span style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 14px;">🌟</span>
+                      <span>Semua Brand (Global View)</span>
+                    </span>
                     <?php if (empty($active_brand_id)): ?>
-                      <i class="fa fa-check text-primary"></i>
+                      <span class="badge" style="background-color: #2563eb; color: #fff; font-size: 10px; font-weight: 600; padding: 3px 6px; border-radius: 4px;">Aktif</span>
                     <?php endif; ?>
                   </a>
                 </li>
                 <li class="divider" style="margin: 4px 0;"></li>
                 <?php if (!empty($all_active_brands)): ?>
                   <?php foreach ($all_active_brands as $b): ?>
-                    <li class="<?= ($active_brand_id == $b->id) ? 'active' : '' ?>">
-                      <a href="<?= site_url('administrator/brands/switch_context?brand_id=' . $b->id); ?>" style="padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; font-weight: <?= ($active_brand_id == $b->id) ? '700' : '500' ?>; color: <?= ($active_brand_id == $b->id) ? '#2563eb' : '#334155' ?>;">
-                        <span style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                          🏷️ <?= _ent($b->name); ?>
+                    <li class="brand-item <?= ($active_brand_id == $b->id) ? 'brand-item-active' : '' ?>">
+                      <a href="<?= site_url('administrator/brands/switch_context?brand_id=' . $b->id); ?>" style="font-weight: <?= ($active_brand_id == $b->id) ? '700' : '500' ?>; color: <?= ($active_brand_id == $b->id) ? '#1d4ed8' : '#334155' ?>;" title="<?= _ent($b->name); ?>">
+                        <span style="display: flex; align-items: center; gap: 8px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                          <span style="font-size: 14px;">🏷️</span>
+                          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= _ent($b->name); ?></span>
                         </span>
                         <?php if ($active_brand_id == $b->id): ?>
-                          <i class="fa fa-check text-primary"></i>
+                          <span class="badge" style="background-color: #2563eb; color: #fff; font-size: 10px; font-weight: 600; padding: 3px 6px; border-radius: 4px;">Aktif</span>
                         <?php endif; ?>
                       </a>
                     </li>
@@ -217,7 +243,7 @@
                 <?php endif; ?>
                 <li class="divider" style="margin: 4px 0;"></li>
                 <li>
-                  <a href="<?= site_url('administrator/brands/add'); ?>" style="padding: 8px 16px; color: #2563eb; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                  <a href="<?= site_url('administrator/brands/add'); ?>" style="padding: 10px 16px; color: #2563eb; font-weight: 600; display: flex; align-items: center; gap: 8px;">
                     <i class="fa fa-plus-circle"></i> Tambah Brand Baru
                   </a>
                 </li>

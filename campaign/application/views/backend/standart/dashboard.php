@@ -418,14 +418,42 @@
 
 <!-- Content Header -->
 <section class="content-header dashboard-header">
-    <h1 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0;">
-        Dashboard <small style="font-size: 13px; color: #64748b; font-weight: normal; margin-left: 6px;">Ringkasan Kinerja &amp; Status Sistem KOL</small>
-    </h1>
-    <ol class="breadcrumb" style="font-size: 12px; background: transparent; padding: 0; margin-top: 4px;">
-        <li><a href="#" style="color: #64748b;"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#" style="color: #64748b;">Evaluasi</a></li>
-        <li class="active" style="color: #0f172a; font-weight: 600;">Dashboard</li>
-    </ol>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <h1 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0;">
+                Dashboard <small style="font-size: 13px; color: #64748b; font-weight: normal; margin-left: 6px;">Ringkasan Kinerja &amp; Status Sistem KOL</small>
+            </h1>
+            <ol class="breadcrumb" style="font-size: 12px; background: transparent; padding: 0; margin-top: 4px; position: static;">
+                <li><a href="#" style="color: #64748b;"><i class="fa fa-dashboard"></i> Home</a></li>
+                <li><a href="#" style="color: #64748b;">Evaluasi</a></li>
+                <li class="active" style="color: #0f172a; font-weight: 600;">Dashboard</li>
+            </ol>
+        </div>
+        <div>
+            <?php 
+                $dash_active_brand = function_exists('get_active_brand') ? get_active_brand() : null; 
+            ?>
+            <?php if ($dash_active_brand): ?>
+                <div style="display: inline-flex; align-items: center; gap: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 7px 16px; box-shadow: 0 1px 2px rgba(37, 99, 235, 0.05);">
+                    <div style="width: 28px; height: 28px; border-radius: 6px; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 14px;">🏷️</div>
+                    <div>
+                        <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: #2563eb; letter-spacing: 0.5px; line-height: 1;">Konteks Brand Aktif</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #1e3a8a; margin-top: 2px;">
+                            <?= _ent($dash_active_brand->name); ?> <span style="font-size: 11px; font-weight: 600; color: #3b82f6;">(<?= _ent($dash_active_brand->code); ?>)</span>
+                        </div>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div style="display: inline-flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 7px 16px;">
+                    <div style="width: 28px; height: 28px; border-radius: 6px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 14px;">🌟</div>
+                    <div>
+                        <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; color: #64748b; letter-spacing: 0.5px; line-height: 1;">Konteks Brand</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #334155; margin-top: 2px;">Semua Brand (Global View)</div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
 </section>
 
 <!-- Main content -->
