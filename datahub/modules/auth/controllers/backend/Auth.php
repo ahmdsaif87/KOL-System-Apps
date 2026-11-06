@@ -113,7 +113,7 @@ class Auth extends Admin
 		$data = [];
 
 		$this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
-		$this->form_validation->set_rules('captcha', 'Captcha', 'trim|required|callback_valid_captcha');
+		// $this->form_validation->set_rules('captcha', 'Captcha', 'trim|required|callback_valid_captcha');
 
 		$this->form_validation->set_message('is_unique', 'User already used');
 
@@ -140,7 +140,7 @@ class Auth extends Admin
 	public function logout()
 	{
 		$this->aauth->logout();
-		redirect('/');
+		redirect('administrator/login', 'refresh');
 	}
 }
 

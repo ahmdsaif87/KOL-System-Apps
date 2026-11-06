@@ -14,6 +14,12 @@ class Keyapi_config extends Admin
         $this->load->helper(['app', 'url']);
         $this->load->database();
         $this->lang->load('web_lang', $this->current_lang);
+
+        // QA-001: Strict Superadmin Authorization Guard
+        if (!$this->aauth->is_admin()) {
+            show_error('Akses ditolak. Halaman konfigurasi API hanya dapat diakses oleh Administrator.', 403, '403 Forbidden');
+            exit;
+        }
     }
 
     /**
@@ -21,9 +27,7 @@ class Keyapi_config extends Admin
      */
     public function index()
     {
-        if (!$this->aauth->is_admin() && !$this->aauth->is_member('Admin')) {
-            $this->is_allowed('keyapi_config_view', false);
-        }
+        $this->is_allowed('keyapi_config_view');
 
         // Auto-register menu in database
         $this->_ensure_menu_exists();

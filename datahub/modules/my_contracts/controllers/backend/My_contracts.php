@@ -124,8 +124,13 @@ class My_contracts extends Admin
         } 
         // Case 2: Upload File
         elseif (isset($_FILES['contract_file']) && $_FILES['contract_file']['error'] === 0) {
-            $ext = pathinfo($_FILES['contract_file']['name'], PATHINFO_EXTENSION);
-            $signature_image_name = 'kol_sign_' . $id . '_' . time() . '.' . $ext;
+            $ext = strtolower(pathinfo($_FILES['contract_file']['name'], PATHINFO_EXTENSION));
+            $allowed_ext = ['pdf', 'png', 'jpg', 'jpeg'];
+            if (!in_array($ext, $allowed_ext)) {
+                echo json_encode(['success' => false, 'message' => 'Format file tidak didukung. Harap unggah file PDF, PNG, atau JPG.']);
+                exit;
+            }
+            $signature_image_name = 'kol_sign_' . $id . '_' . time() . '_' . substr(md5(uniqid(mt_rand(), true)), 0, 8) . '.' . $ext;
             move_uploaded_file($_FILES['contract_file']['tmp_name'], $upload_path . $signature_image_name);
         } else {
             echo json_encode(['success' => false, 'message' => 'Tanda tangan atau file belum disertakan.']);

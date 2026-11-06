@@ -90,14 +90,16 @@
         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       </div>
       <?php $cap = get_captcha(); ?>
-      <div class="form-group <?= form_error('email') ? 'has-error' :''; ?>">
+      <?php if ($cap && is_array($cap)): ?>
+      <div class="form-group <?= form_error('captcha') ? 'has-error' :''; ?>">
       <label><?= cclang('human_challenge'); ?> <span class="required">*</span> </label>
-      <div class="captcha-box"  data-captcha-time="<?= $cap['time']; ?>">
+      <div class="captcha-box"  data-captcha-time="<?= !empty($cap['time']) ? $cap['time'] : ''; ?>">
           <input type="text" name="captcha" placeholder="">
           <a class="btn btn-flat  refresh-captcha  "><i class="fa fa-refresh text-danger"></i></a>
-          <span  class="box-image"><?= $cap['image']; ?></span>
+          <span  class="box-image"><?= !empty($cap['image']) ? $cap['image'] : ''; ?></span>
       </div>
       </div>
+      <?php endif; ?>
       <small class="info help-block">
       </small>
       <div class="row">

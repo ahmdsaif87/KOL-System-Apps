@@ -142,7 +142,7 @@ class Register extends Admin
 			];
 
 			if (!is_dir(FCPATH . '/uploads/kols/')) {
-				mkdir(FCPATH . '/uploads/kols/');
+				mkdir(FCPATH . '/uploads/kols/', 0777, true);
 			}
 
 			if (!empty($kols_rate_card_file_name)) {
@@ -230,8 +230,12 @@ class Register extends Admin
 		]);
 	}
 
-	public function delete_rate_card_file($uuid)
+	public function delete_rate_card_file($uuid = '')
 	{
+		if (empty($uuid)) {
+			echo json_encode(['success' => true]);
+			return;
+		}
 		echo $this->delete_file([
             'uuid'              => $uuid, 
             'delete_by'         => $this->input->get('by'), 

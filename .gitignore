@@ -25,6 +25,7 @@ campaign/uploads
 datahub/uploads
 shared/uploads/*
 !shared/uploads/.gitkeep
+!shared/uploads/.htaccess
 
 # --- Out-of-scope repo ini (dikelola terpisah, tetap ada di disk) ------------
 whatsapp-service/

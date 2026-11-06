@@ -464,6 +464,9 @@ if(!function_exists('get_captcha')) {
 		);
 
 		$cap = create_captcha($vals);
+		if (!$cap || !is_array($cap) || empty($cap['word'])) {
+			return false;
+		}
 		$expiration = time() - 7200; // Two hour limit
 		$ci->db->where('captcha_time < ', $expiration)
 		        ->delete('captcha');

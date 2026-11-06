@@ -8,4 +8,5 @@ $route['translate_uri_dashes'] = FALSE;
 $route['artikel'] = 'artikel/index';
 $route['artikel/(:any)'] = 'artikel/detail/$1';
 $route['login'] = 'login/index';
+$route['register'] = 'register/index';
 $route['sitemap.xml'] = 'home/sitemap';
