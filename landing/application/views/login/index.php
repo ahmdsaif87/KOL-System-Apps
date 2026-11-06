@@ -1,3 +1,6 @@
+<?php
+$datahub_register_url = $this->config->item('datahub_register_url') ?: rtrim($this->config->item('datahub_url'), '/') . '/web/register';
+?>
     <!-- ===== PORTAL LOGIN ===== -->
     <section class="relative overflow-hidden bg-gradient-to-b from-[#004ac6]/5 via-transparent to-transparent py-16 sm:py-24">
       <div class="mx-auto flex max-w-[1240px] flex-col items-center px-5 sm:px-8 lg:px-16">
@@ -21,50 +24,78 @@
         </div>
 
         <div class="mt-12 grid w-full max-w-[900px] grid-cols-1 gap-6 md:grid-cols-2">
-          <a href="<?= html_escape($this->config->item('campaign_url')) ?>"
-             class="group flex flex-col rounded-2xl bg-white p-8 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] ring-1 ring-slate-900/5 transition duration-300 hover:-translate-y-1 hover:shadow-[0px_18px_30px_-12px_rgba(23,43,77,0.25)]">
-            <div class="flex items-center justify-between">
-              <div class="flex size-12 items-center justify-center rounded-xl bg-[#dbe1ff]">
-                <img src="<?= base_url('assets/icons/brief-contract.svg') ?>" alt="" class="h-[23.33px] w-[18.67px]">
+          <div class="group flex flex-col justify-between rounded-2xl bg-white p-8 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] ring-1 ring-slate-900/5 transition duration-300 hover:-translate-y-1 hover:shadow-[0px_18px_30px_-12px_rgba(23,43,77,0.25)]">
+            <div>
+              <div class="flex items-center justify-between">
+                <div class="flex size-12 items-center justify-center rounded-xl bg-[#dbe1ff]">
+                  <img src="<?= base_url('assets/icons/brief-contract.svg') ?>" alt="" class="h-[23.33px] w-[18.67px]">
+                </div>
+                <span class="inline-flex items-center rounded-full bg-[#dbe1ff]/70 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand">
+                  For Brand
+                </span>
               </div>
-              <span class="inline-flex items-center rounded-full bg-[#dbe1ff]/70 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand">
-                For Brand
-              </span>
+              <h2 class="mt-4 font-display text-[22px] font-bold leading-[30px] tracking-[-0.01em] text-ink">
+                <a href="<?= html_escape($this->config->item('campaign_url')) ?>" class="transition hover:text-brand">
+                  Campaign Management
+                </a>
+              </h2>
+              <p class="mt-2 text-base leading-[26px] tracking-[-0.005em] text-body">
+                Brief, kontrak digital, review draft, pengiriman sampel, hingga pembayaran kreator dalam satu alur.
+              </p>
             </div>
-            <h2 class="mt-4 font-display text-[22px] font-bold leading-[30px] tracking-[-0.01em] text-ink">Campaign Management</h2>
-            <p class="mt-2 text-base leading-[26px] tracking-[-0.005em] text-body">
-              Brief, kontrak digital, review draft, pengiriman sampel, hingga pembayaran kreator dalam satu alur.
-            </p>
-            <span class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand">
-              Masuk sebagai Brand
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="transition group-hover:translate-x-1"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </span>
-          </a>
+            <div class="mt-8 flex items-center justify-between border-t border-slate-100 pt-5">
+              <a href="<?= html_escape($this->config->item('campaign_url')) ?>"
+                 class="group/btn inline-flex items-center gap-2 text-sm font-semibold text-brand hover:text-accent">
+                Masuk sebagai Brand
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="transition group-hover/btn:translate-x-1"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+            </div>
+          </div>
 
-          <a href="<?= html_escape($this->config->item('datahub_url')) ?>"
-             class="group flex flex-col rounded-2xl bg-white p-8 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] ring-1 ring-slate-900/5 transition duration-300 hover:-translate-y-1 hover:shadow-[0px_18px_30px_-12px_rgba(23,43,77,0.25)]">
-            <div class="flex items-center justify-between">
-              <div class="flex size-12 items-center justify-center rounded-xl bg-[#85f8c4]">
-                <img src="<?= base_url('assets/icons/analytics-views.svg') ?>" alt="" class="h-[21px] w-5">
+          <div class="group flex flex-col justify-between rounded-2xl bg-white p-8 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] ring-1 ring-slate-900/5 transition duration-300 hover:-translate-y-1 hover:shadow-[0px_18px_30px_-12px_rgba(23,43,77,0.25)]">
+            <div>
+              <div class="flex items-center justify-between">
+                <div class="flex size-12 items-center justify-center rounded-xl bg-[#85f8c4]">
+                  <img src="<?= base_url('assets/icons/analytics-views.svg') ?>" alt="" class="h-[21px] w-5">
+                </div>
+                <span class="inline-flex items-center rounded-full bg-[#85f8c4]/40 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-800">
+                  For KOL
+                </span>
               </div>
-              <span class="inline-flex items-center rounded-full bg-[#85f8c4]/40 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-800">
-                For KOL
-              </span>
+              <h2 class="mt-4 font-display text-[22px] font-bold leading-[30px] tracking-[-0.01em] text-ink">
+                <a href="<?= html_escape($this->config->item('datahub_url')) ?>" class="transition hover:text-brand">
+                  KOL Datahub
+                </a>
+              </h2>
+              <p class="mt-2 text-base leading-[26px] tracking-[-0.005em] text-body">
+                Riset kreator, benchmark rate card, dan analisis performa berbasis data postingan terbaru.
+              </p>
             </div>
-            <h2 class="mt-4 font-display text-[22px] font-bold leading-[30px] tracking-[-0.01em] text-ink">KOL Datahub</h2>
-            <p class="mt-2 text-base leading-[26px] tracking-[-0.005em] text-body">
-              Riset kreator, benchmark rate card, dan analisis performa berbasis data postingan terbaru.
-            </p>
-            <span class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand">
-              Masuk sebagai KOL
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="transition group-hover:translate-x-1"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </span>
-          </a>
+            <div class="mt-8 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <a href="<?= html_escape($this->config->item('datahub_url')) ?>"
+                 class="group/btn inline-flex items-center gap-2 text-sm font-semibold text-brand hover:text-accent">
+                Masuk sebagai KOL
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="transition group-hover/btn:translate-x-1"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+              <a href="<?= html_escape($datahub_register_url) ?>"
+                 class="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 sm:text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                Register as a KOL
+              </a>
+            </div>
+          </div>
         </div>
 
-        <p class="mt-8 text-center text-sm text-[#737686]">
-          Belum punya akun?
-          <a href="<?= html_escape($this->config->item('contact_url')) ?>" class="font-semibold text-brand hover:text-accent">Hubungi tim kami</a>
-        </p>
+        <div class="mt-8 flex flex-col items-center justify-center gap-2 text-center text-sm text-[#737686] sm:flex-row sm:gap-4">
+          <p>
+            Belum punya akun Brand?
+            <a href="<?= html_escape($this->config->item('contact_url')) ?>" class="font-semibold text-brand hover:text-accent">Hubungi tim kami</a>
+          </p>
+          <span class="hidden text-slate-300 sm:inline" aria-hidden="true">•</span>
+          <p>
+            Belum punya akun KOL?
+            <a href="<?= html_escape($datahub_register_url) ?>" class="font-semibold text-emerald-700 hover:text-emerald-800">Register as a KOL</a>
+          </p>
+        </div>
       </div>
     </section>

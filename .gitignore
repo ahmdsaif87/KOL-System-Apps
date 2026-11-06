@@ -56,3 +56,5 @@ config-private/
 .DS_Store
 .idea/
 .vscode/
+
+docs/

@@ -50,12 +50,13 @@ $config['cdn_url'] = $cdn_url !== false && $cdn_url !== '' ? rtrim($cdn_url, '/'
 
 /*
 |--------------------------------------------------------------------------
-| Application URL portal (tombol login)
+| Application URL portal (tombol login & registrasi)
 |--------------------------------------------------------------------------
 */
-$config['campaign_url'] = getenv('LANDING_CAMPAIGN_URL') ?: $config['base_url'] . 'campaign';
-$config['datahub_url']  = getenv('LANDING_DATAHUB_URL') ?: $config['base_url'] . 'datahub';
-$config['contact_url']  = getenv('LANDING_CONTACT_URL') ?: 'mailto:hello@kolab.id';
+$config['campaign_url']         = getenv('LANDING_CAMPAIGN_URL') ?: $config['base_url'] . 'campaign';
+$config['datahub_url']          = getenv('LANDING_DATAHUB_URL') ?: $config['base_url'] . 'datahub';
+$config['datahub_register_url'] = getenv('LANDING_DATAHUB_REGISTER_URL') ?: rtrim($config['datahub_url'], '/') . '/web/register';
+$config['contact_url']          = getenv('LANDING_CONTACT_URL') ?: 'https://idmetafora.com/';
 
 /*
 |--------------------------------------------------------------------------

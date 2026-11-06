@@ -212,13 +212,14 @@
 
          // The "Analyze Sentiment" button is disabled when no live URL exists
          $has_live_url = !empty($live_url);
+         $is_sentiment_open = ($s && $s_total > 0);
          ?>
 
          <div class="box task-card-sentiment" style="border: 0; border-radius: 8px; box-shadow: 0 2px 12px rgba(23,43,77,0.10); margin-bottom: 20px; border-top: 4px solid #8e44ad;">
             <div class="box-body" style="padding: 20px;">
 
                <!-- Card Header -->
-               <div class="task-sec-header collapsed" data-toggle="collapse" data-target="#collapseSentiment" aria-expanded="false" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid #edf2f7; padding-bottom: 15px; margin-bottom: 18px;">
+               <div class="task-sec-header <?= $is_sentiment_open ? '' : 'collapsed'; ?>" data-toggle="collapse" data-target="#collapseSentiment" aria-expanded="<?= $is_sentiment_open ? 'true' : 'false'; ?>" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid #edf2f7; padding-bottom: 15px; margin-bottom: 18px;">
                   <div>
                      <h4 style="margin: 0; color: #172b4d; font-weight: 700; font-size: 17px;">
                         <i class="fa fa-comments" style="color: #8e44ad; margin-right: 6px;"></i>
@@ -256,7 +257,7 @@
                   </div>
                </div>
 
-               <div id="collapseSentiment" class="collapse task-sec-body">
+               <div id="collapseSentiment" class="collapse <?= $is_sentiment_open ? 'in' : ''; ?> task-sec-body">
 
                <?php if ($s && $s_total > 0): ?>
 
@@ -882,17 +883,113 @@
 <!-- Sentiment Analysis AJAX Handler -->
 <script>
    $(document).ready(function () {
-      $('#btn_analyze_sentiment').click(function () {
+      function doAnalyzeSentiment(taskId, commentLimit, force) {
+         var $btn = $('#btn_analyze_sentiment');
+         var origHtml = $btn.html();
+
+         // Buka otomatis accordion sentimen agar progres dan hasil langsung terlihat
+         $('#collapseSentiment').collapse('show');
+
+         $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Sedang menganalisis komentar...');
+
+         // Alert proses aktif agar user tahu scraping & inferensi IndoBERT sedang berjalan
+         swal({
+            title: "Sedang Menganalisis...",
+            text: "Mohon tunggu 10–30 detik. Sistem sedang mengambil komentar postingan dan menjalankan inferensi AI IndoBERT...",
+            type: "info",
+            showConfirmButton: false
+         });
+
+         var csrfName = '<?= $this->security->get_csrf_token_name(); ?>';
+         var csrfHash = '<?= $this->security->get_csrf_hash(); ?>';
+         var postData = {};
+         postData[csrfName] = csrfHash;
+         postData['limit'] = commentLimit;
+         if (force) {
+            postData['force'] = 1;
+         }
+
+         $.ajax({
+            url:      BASE_URL + 'administrator/tasks/analyze_sentiment/' + taskId,
+            type:     'POST',
+            dataType: 'json',
+            data:     postData,
+            timeout:  90000,
+
+            success: function (res) {
+               if (res[csrfName]) {
+                  csrfHash = res[csrfName];
+               }
+
+               $btn.prop('disabled', false).html(origHtml);
+
+               if (res.status) {
+                  swal({
+                     title: "Analisis Berhasil!",
+                     text: res.message,
+                     type: "success",
+                     confirmButtonText: "Lihat Hasil"
+                  }, function () {
+                     window.location.reload();
+                  });
+               } else if (res.is_cooldown) {
+                  swal({
+                     title: "Analisis Baru Saja Dilakukan",
+                     text: res.message + "\n\nApakah Anda ingin tetap menganalisis ulang sekarang?",
+                     type: "warning",
+                     showCancelButton: true,
+                     confirmButtonColor: "#8e44ad",
+                     confirmButtonText: "Ya, Tetap Analisis",
+                     cancelButtonText: "Tutup"
+                  }, function (isForce) {
+                     if (isForce) {
+                        doAnalyzeSentiment(taskId, commentLimit, true);
+                     }
+                  });
+               } else {
+                  swal({
+                     title: "Analisis Gagal",
+                     text: res.message || "Terjadi kesalahan yang tidak diketahui.",
+                     type: "warning",
+                     confirmButtonText: "Tutup"
+                  });
+               }
+            },
+
+            error: function (xhr) {
+               $btn.prop('disabled', false).html(origHtml);
+
+               var msg = "Terjadi kesalahan saat menghubungi server. Pastikan server aktif dan coba lagi.";
+               if (xhr.status === 401) {
+                  msg = "Sesi Anda telah berakhir. Silakan refresh halaman dan login kembali.";
+               } else if (xhr.status === 0) {
+                  msg = "Koneksi timeout atau microservice tidak merespons setelah 90 detik. Coba lagi beberapa saat.";
+               }
+
+               swal({
+                  title: "Gagal Terhubung",
+                  text: msg,
+                  type: "error",
+                  confirmButtonText: "Tutup"
+               });
+            }
+         });
+      }
+
+      $('#btn_analyze_sentiment').on('click', function (e) {
+         e.preventDefault();
+         e.stopPropagation();
+
          var $btn    = $(this);
          var taskId  = $btn.data('id');
          var commentLimit = parseInt($('#sentiment_limit').val(), 10) || 500;
          if (commentLimit < 50)  commentLimit = 50;
          if (commentLimit > 1000) commentLimit = 1000;
 
-         // SweetAlert confirmation to prevent accidental clicks on expensive API calls
+         // SweetAlert konfirmasi
          swal({
             title: "Analisis Sentimen",
-            text: "Proses ini akan mengambil maksimal " + commentLimit + " komentar dari postingan dan menganalisisnya menggunakan IndoBERT. Proses dapat memakan waktu 10–30 detik. Lanjutkan?",
+            text: "Proses ini akan mengambil maksimal " + commentLimit + " komentar dari postingan dan menganalisisnya menggunakan IndoBERT. Proses memakan waktu 10–30 detik. Lanjutkan?",
             type: "info",
             showCancelButton: true,
             confirmButtonColor: "#8e44ad",
@@ -900,69 +997,7 @@
             cancelButtonText: "Batal"
          }, function (isConfirm) {
             if (!isConfirm) return;
-
-            // Double-click guard: disable immediately
-            var origHtml = $btn.html();
-            $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Sedang menganalisis komentar...');
-
-             var csrfName = '<?= $this->security->get_csrf_token_name(); ?>';
-             var csrfHash = '<?= $this->security->get_csrf_hash(); ?>';
-             var postData = {};
-             postData[csrfName] = csrfHash;
-             postData['limit'] = commentLimit;
-
-            $.ajax({
-               url:      BASE_URL + 'administrator/tasks/analyze_sentiment/' + taskId,
-               type:     'POST',
-               dataType: 'json',
-               data:     postData,
-               timeout:  90000, // 90s — generous for scraping + inference
-
-               success: function (res) {
-                  // Sync refreshed CSRF token
-                  if (res[csrfName]) {
-                     csrfHash = res[csrfName];
-                  }
-
-                  $btn.prop('disabled', false).html(origHtml);
-
-                  if (res.status) {
-                     swal({
-                        title: "Analisis Berhasil!",
-                        text: res.message,
-                        type: "success",
-                        confirmButtonText: "Lihat Hasil"
-                     }, function () {
-                        window.location.reload();
-                     });
-                  } else {
-                     swal({
-                        title: "Analisis Gagal",
-                        text: res.message || "Terjadi kesalahan yang tidak diketahui.",
-                        type: "warning",
-                        confirmButtonText: "Tutup"
-                     });
-                  }
-               },
-
-               error: function (xhr) {
-                  $btn.prop('disabled', false).html(origHtml);
-
-                  var msg = "Terjadi kesalahan saat menghubungi server. Pastikan Laragon aktif dan coba lagi.";
-                  if (xhr.status === 401) {
-                     msg = "Sesi Anda telah berakhir. Silakan refresh halaman dan login kembali.";
-                  } else if (xhr.status === 0) {
-                     msg = "Koneksi timeout atau microservice tidak merespons setelah 90 detik. Coba lagi beberapa saat.";
-                  }
-
-                  swal({
-                     title: "Gagal Terhubung",
-                     text: msg,
-                     type: "error",
-                     confirmButtonText: "Tutup"
-                  });
-               }
-            });
+            doAnalyzeSentiment(taskId, commentLimit, false);
          });
       });
    });
@@ -971,8 +1006,8 @@
 <!-- Collapse Mobile Interaction Handler -->
 <script>
    $(document).ready(function () {
-      // Cegah klik tombol / link / input di dalam header memicu toggle collapse
-      $('.task-sec-header a, .task-sec-header button, .task-sec-header input, .task-sec-header label').on('click', function (e) {
+      // Cegah klik link / input di dalam header memicu toggle collapse
+      $('.task-sec-header a, .task-sec-header input, .task-sec-header label').on('click', function (e) {
          e.stopPropagation();
       });
 

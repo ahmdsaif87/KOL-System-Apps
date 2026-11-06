@@ -11,19 +11,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 
 // Base URL & token diatur via DB cc_options (sentiment_base_url / sentiment_bearer_token),
-// MIRIP dengan KeyAPI & Apify. Nilai di sini hanya fallback INERT (kosong).
-$config['sentiment_base_url'] = '';
+// MIRIP dengan KeyAPI & Apify. Nilai di sini adalah fallback default.
+$config['sentiment_base_url'] = 'https://ahmdsaif-kol-sentiment-api.hf.space';
 // Bearer token untuk Authorization header
-$config['sentiment_bearer_token'] = '';
+$config['sentiment_bearer_token'] = 'kol-system';
 
 // cURL connect timeout in seconds (connection establishment only)
-$config['sentiment_connect_timeout'] = 10;
+$config['sentiment_connect_timeout'] = 30;
 
-// cURL total request timeout in seconds (scraping + inference may take 10–25s)
-$config['sentiment_timeout'] = 60;
+// cURL total request timeout in seconds (scraping + inference may take 15–45s)
+$config['sentiment_timeout'] = 90;
 
 // Maximum number of comments to scrape & analyze per request (1–1000)
 $config['sentiment_comment_limit'] = 500;
 
 // Minimum minutes between re-analyses for the same task (cooldown)
-$config['sentiment_cooldown_minutes'] = 5;
+$config['sentiment_cooldown_minutes'] = 1;

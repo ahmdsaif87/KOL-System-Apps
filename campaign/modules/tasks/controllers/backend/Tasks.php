@@ -2060,16 +2060,18 @@ class Tasks extends Admin
 				return;
 			}
 
-			// 4. Cooldown check — prevent re-analysis within 5 minutes
-			$cooldown_cfg = (int) ($this->config->item('sentiment_cooldown_minutes', 'sentiment') ?: 5);
+			// 4. Cooldown check — prevent re-analysis within cooldown, unless forced
+			$is_force = (bool) $this->input->post('force');
+			$cooldown_cfg = (int) ($this->config->item('sentiment_cooldown_minutes', 'sentiment') ?: 1);
 			$cooldown = $this->model_task_sentiments->get_cooldown_status($id, $cooldown_cfg);
 
-			if ($cooldown['active']) {
+			if (!$is_force && $cooldown['active']) {
 				$secs = $cooldown['seconds_remaining'];
 				$mins_left = ceil($secs / 60);
 				echo json_encode([
-					'status'  => false,
-					'message' => "Analisis baru saja dilakukan " . $cooldown['minutes_ago'] . " menit yang lalu. Harap tunggu {$mins_left} menit lagi sebelum menganalisis ulang."
+					'status'      => false,
+					'is_cooldown' => true,
+					'message'     => "Analisis baru saja dilakukan " . $cooldown['minutes_ago'] . " menit yang lalu. Harap tunggu {$mins_left} menit lagi sebelum menganalisis ulang."
 				]);
 				return;
 			}

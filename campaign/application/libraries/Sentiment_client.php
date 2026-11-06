@@ -50,10 +50,15 @@ class Sentiment_client
         $this->ci = &get_instance();
         $this->ci->config->load('sentiment', TRUE);
 
-        $this->base_url        = rtrim((get_option('sentiment_base_url') ?: $this->ci->config->item('sentiment_base_url', 'sentiment')) ?: '', '/');
+        $raw_url = rtrim((get_option('sentiment_base_url') ?: $this->ci->config->item('sentiment_base_url', 'sentiment')) ?: '', '/');
+        // Convert Hugging Face web space URL (https://huggingface.co/spaces/user/space) to direct app URL (https://user-space.hf.space)
+        if (preg_match('#https?://huggingface\.co/spaces/([^/]+)/([^/]+)#i', $raw_url, $matches)) {
+            $raw_url = 'https://' . strtolower($matches[1]) . '-' . strtolower($matches[2]) . '.hf.space';
+        }
+        $this->base_url        = $raw_url;
         $this->bearer_token    = (get_option('sentiment_bearer_token') ?: $this->ci->config->item('sentiment_bearer_token', 'sentiment'));
         $this->connect_timeout = (int) ($this->ci->config->item('sentiment_connect_timeout', 'sentiment') ?: 10);
-        $this->timeout         = (int) ($this->ci->config->item('sentiment_timeout', 'sentiment') ?: 60);
+        $this->timeout         = (int) ($this->ci->config->item('sentiment_timeout', 'sentiment') ?: 90);
         $this->comment_limit   = (int) ($this->ci->config->item('sentiment_comment_limit', 'sentiment') ?: 500);
     }
 
@@ -80,10 +85,28 @@ class Sentiment_client
 
         $data = $res['data'];
 
+        // 1. Standard FastAPI health check JSON response
+        if (is_array($data)) {
+            return [
+                'healthy'      => isset($data['status']) && $data['status'] === 'healthy',
+                'model_loaded' => isset($data['model_loaded']) && $data['model_loaded'] === true,
+                'error'        => null,
+            ];
+        }
+
+        // 2. Fallback for Hugging Face Spaces / Gradio SDK where GET routes serve Gradio HTML shell with 200 OK
+        if (isset($res['http_code']) && $res['http_code'] === 200) {
+            return [
+                'healthy'      => true,
+                'model_loaded' => true,
+                'error'        => null,
+            ];
+        }
+
         return [
-            'healthy'      => isset($data['status']) && $data['status'] === 'healthy',
-            'model_loaded' => isset($data['model_loaded']) && $data['model_loaded'] === true,
-            'error'        => null,
+            'healthy'      => false,
+            'model_loaded' => false,
+            'error'        => 'Format response health check tidak valid.',
         ];
     }
 
@@ -177,6 +200,15 @@ class Sentiment_client
      */
     protected function _request($endpoint, $method = 'GET', $data = null)
     {
+        if (empty($this->base_url)) {
+            return [
+                'success'   => false,
+                'http_code' => 0,
+                'data'      => null,
+                'error'     => 'Base URL microservice sentimen belum dikonfigurasi.',
+            ];
+        }
+
         $url = $this->base_url . '/' . ltrim($endpoint, '/');
 
         $ch = curl_init();

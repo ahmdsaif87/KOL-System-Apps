@@ -276,8 +276,10 @@ jQuery.expr[':'].regex = function(elem, index, match) {
               width: "95%"
           }
       }
-      for (var selector in config) {
-          $(selector).chosen(config[selector]);
+      if ($.fn.chosen) {
+          for (var selector in config) {
+              $(selector).chosen(config[selector]);
+          }
       }
       //Flat red color scheme for iCheck
       $('input[type="radio"].flat-red').iCheck({
